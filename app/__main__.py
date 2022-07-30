@@ -1,4 +1,3 @@
-from venv import create
 from app import app
 from app import views
 from app import errorHandlers
