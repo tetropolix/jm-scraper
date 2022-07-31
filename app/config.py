@@ -9,16 +9,16 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-class DevelopmentConfig(Config):
+class DevelopmentLocalConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI_DEV")
 
 
-class DevelopmentConfigRemote(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI_DEV_REMOTE")
+class DevelopmentRemoteConfig(Config):
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABSE_URL")
 
 
 config = {
-    "development": DevelopmentConfig,
-    "developmentRemote": DevelopmentConfigRemote,
+    "developmentLocal": DevelopmentLocalConfig,
+    "developmentRemote": DevelopmentRemoteConfig,
 }

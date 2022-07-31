@@ -1,1 +1,1 @@
-web: gunicorn 'app.wsgi:create_app("developmentRemote")'
+web: gunicorn app.__main__:app
