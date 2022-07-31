@@ -15,7 +15,7 @@ class DevelopmentLocalConfig(Config):
 
 
 class DevelopmentRemoteConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABSE_URL")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
 
 config = {
