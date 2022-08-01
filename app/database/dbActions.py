@@ -1,5 +1,7 @@
 from datetime import datetime
 from typing import Dict, List, Optional
+
+import werkzeug
 from app import create_app, db
 from app.database.models import (
     Brand,
@@ -24,8 +26,10 @@ from operator import attrgetter
 from sqlalchemy import func
 
 
-def createProductFilterConditions(filterOptions: FilterOptions) -> List:
+def createProductFilterConditions(filterOptions: Optional[FilterOptions]) -> List:
     conditions = []
+    if filterOptions == None:
+        return conditions
     (brandName, name, gender,) = attrgetter(
         "brandName", "name", "gender"
     )(filterOptions)
@@ -50,8 +54,10 @@ def createProductFilterConditions(filterOptions: FilterOptions) -> List:
     return conditions
 
 
-def createProductDataFilterConditions(filterOptions: FilterOptions) -> List:
+def createProductDataFilterConditions(filterOptions: Optional[FilterOptions]) -> List:
     conditions = []
+    if filterOptions == None:
+        return conditions
     (minPrice, maxPrice, percentOff, outOfStock, shoeSize, domain) = attrgetter(
         "minPrice",
         "maxPrice",
@@ -222,28 +228,43 @@ def queryProductById(id: int):
 def paginateProductsWithProductData(
     page: int, productsPerPage: int, filterOptions: FilterOptions = None
 ) -> Optional[Dict[Product, ProductData]]:
-    count = Product.query.count()
     output = {}
-    if page > ceil(count / productsPerPage):
-        return None
-    if filterOptions == None:
-        products = Product.query.paginate(page=page, per_page=productsPerPage)
-    else:
-        productConditions = createProductFilterConditions(filterOptions)
-        products = Product.query.filter(*productConditions).paginate(
-            page=page, per_page=productsPerPage
+    productConditions = createProductFilterConditions(filterOptions)
+    productDataConditions = createProductDataFilterConditions(filterOptions)
+    latestProductDataForProducts = (
+        db.session.query(func.max(ProductData.scraped_at), ProductData.product_id)
+        .group_by(ProductData.product_id)
+        .all()
+    )
+    productsQuery = (
+        Product.query.distinct()
+        .filter(*productConditions)
+        .join(Product.product_data)
+        .filter(
+            *productDataConditions,
         )
+    ).filter(
+        Product.id.in_(
+            map(
+                lambda productData: productData.product_id,
+                latestProductDataForProducts,
+            )
+        )
+    )
+    try:
+        products = productsQuery.paginate(page=page, per_page=productsPerPage)
+    except werkzeug.exceptions.HTTPException:
+        return None
     for product in products.items:
-        productDataConditions = createProductDataFilterConditions(filterOptions)
         productData = queryLatestProductDataForProduct(
             product, conditions=productDataConditions
         )
         if productData != None:
-            print(productData.eshop.domain)
             output[product] = productData
     return output
 
-#TESTING PURPOSES
+
+# TESTING PURPOSES
 if __name__ == "__main__":
     sz = createShoeSize(
         {

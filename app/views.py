@@ -13,6 +13,8 @@ from app.database.dbActions import (
 )
 from pprint import pprint
 
+# UTILS
+
 
 def checkIfFilterShoudBeApplied(args: dict) -> bool:
     allowedFilterQueryParameters = [
@@ -25,10 +27,10 @@ def checkIfFilterShoudBeApplied(args: dict) -> bool:
         "shoeSize",
         "gender",
         "domain",
-        "us_size",
-        "uk_size",
-        "eu_size",
-        "cm_size",
+        "size_us",
+        "size_uk",
+        "size_eu",
+        "size_cm",
     ]
     for param in allowedFilterQueryParameters:
         if args.get(param) != None:
@@ -73,12 +75,15 @@ def createFilterOptionsFromArgs(args) -> Optional[FilterOptions]:
     return filterOptions if all([shoeSize, filterOptions]) else None
 
 
+##########################
+
+
 @app.route("/products", methods=["GET"])
 def products():
     try:
         page = request.args.get("page", 1, type=int)
         productsPerPage = request.args.get("productsPerPage", 20, type=int)
-        if productsPerPage < 1 or productsPerPage > 64:
+        if productsPerPage < 1 or productsPerPage > 32:
             raise ValueError("Invalid value for for query parameter")
     except ValueError as e:
         abort(404, "Unable to process query parameters!")
@@ -92,6 +97,8 @@ def products():
     products = paginateProductsWithProductData(
         page, productsPerPage, filterOptions=filterOptions
     )
+    if products == None:
+        abort(404,'Page not found!')
     return {
         "products": [
             {
@@ -105,6 +112,18 @@ def products():
                     "originalPrice": productData.original_price,
                     "percentOff": productData.percent_off,
                     "outOfStock": productData.out_of_stock,
+                    "sizes_us": [
+                        us_size.value for us_size in productData.shoe_sizes_us
+                    ],
+                    "sizes_uk": [
+                        uk_size.value for uk_size in productData.shoe_sizes_uk
+                    ],
+                    "sizes_eu": [
+                        eu_size.value for eu_size in productData.shoe_sizes_eu
+                    ],
+                    "sizes_cm": [
+                        cm_size.value for cm_size in productData.shoe_sizes_cm
+                    ],
                 },
             }
             for product, productData in products.items()

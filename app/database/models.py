@@ -1,4 +1,3 @@
-from enum import unique
 from sqlalchemy.orm import relationship
 from app import db
 

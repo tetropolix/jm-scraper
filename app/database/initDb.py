@@ -285,3 +285,4 @@ if __name__ == "__main__":
         except IntegrityError as e:
             print(str(e))
             db.session.rollback()
+        db.session.close()

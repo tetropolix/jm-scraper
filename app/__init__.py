@@ -13,10 +13,14 @@ class ConfigNameNotFoundError(Exception):
 
 
 def create_app(config_name):
+    if config_name == None:
+        raise ConfigNameNotFoundError(
+            'Config name was not specified - equals to None'
+        )
     configClass = config.get(config_name)
     if configClass == None:
         raise ConfigNameNotFoundError(
-            config_name + " " + "was not found in this environment!"
+            config_name + " " + "was not found in this environment"
         )
     # App instance
     app = Flask(__name__)
