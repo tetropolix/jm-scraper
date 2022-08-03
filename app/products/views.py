@@ -1,84 +1,17 @@
-from typing import Optional
-from app import app
-from flask import abort, render_template, request
-from scraping.schemas import (
-    FilterOptions,
-    createFilterOptions,
-    createShoeSize,
-)
-from app.database.dbActions import (
+from flask import abort, request
+from .db_actions import (
     paginateProductsWithProductData,
     queryLatestProductDataForProduct,
     queryProductById,
 )
-from pprint import pprint
-
-# UTILS
-
-
-def checkIfFilterShoudBeApplied(args: dict) -> bool:
-    allowedFilterQueryParameters = [
-        "brandName",
-        "name",
-        "minPrice",
-        "maxPrice",
-        "percentOff",
-        "outOfStock",
-        "shoeSize",
-        "gender",
-        "domain",
-        "size_us",
-        "size_uk",
-        "size_eu",
-        "size_cm",
-    ]
-    for param in allowedFilterQueryParameters:
-        if args.get(param) != None:
-            return True
-    return False
+from .products_utils import (
+    checkIfFilterShoudBeApplied,
+    createFilterOptionsFromArgs,
+)
+from app.products import products_bp
 
 
-def createFilterOptionsFromArgs(args) -> Optional[FilterOptions]:
-    try:
-        shoeSize = createShoeSize(
-            {
-                "us": args.getlist("size_us", type=str),
-                "uk": args.getlist("size_uk", type=str),
-                "eu": args.getlist("size_eu", type=str),
-                "cm": args.getlist("size_cm", type=str),
-            }
-        )
-        filterOptions = createFilterOptions(
-            {
-                "brandName": args.getlist("brandName", type=str) or None,
-                "name": args.get("name", None, type=str),
-                "minPrice": args.get("minPrice", None, type=float),
-                "maxPrice": args.get("maxPrice", None, type=float),
-                "percentOff": args.get("percentOff", None, type=float),
-                "outOfStock": args.get(
-                    "outOfStock",
-                    None,
-                    type=lambda val: val.lower() == "true"
-                    if val.lower() in ["true", "false"]
-                    else val,  # returning val as string proceeds to ValueError exception
-                ),
-                "shoeSize": shoeSize,
-                "gender": [
-                    gender.capitalize() for gender in args.getlist("gender", type=str)
-                ]
-                or None,
-                "domain": args.getlist("domain", type=str) or None,
-            }
-        )
-    except ValueError as e:
-        return None
-    return filterOptions if all([shoeSize, filterOptions]) else None
-
-
-##########################
-
-
-@app.route("/products", methods=["GET"])
+@products_bp.route("/products", methods=["GET"])
 def products():
     try:
         page = request.args.get("page", 1, type=int)
@@ -98,7 +31,7 @@ def products():
         page, productsPerPage, filterOptions=filterOptions
     )
     if products == None:
-        abort(404,'Page not found!')
+        abort(404, "Page not found!")
     return {
         "products": [
             {
@@ -131,7 +64,7 @@ def products():
     }
 
 
-@app.route("/product/<int:productId>", methods=["GET"])
+@products_bp.route("/product/<int:productId>", methods=["GET"])
 def product(productId: int):
     product = queryProductById(productId)
     productData = queryLatestProductDataForProduct(product)

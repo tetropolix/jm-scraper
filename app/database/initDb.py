@@ -1,7 +1,6 @@
 from sqlalchemy.exc import IntegrityError
+from app.database import authModels, productsModels
 from app import db, app
-import models  # models are needed for table initialization
-
 
 US_SIZES = [
     "1",
@@ -254,23 +253,23 @@ ESHOPS = [
 
 def addShoeSizeRecordsToSession():
     for usSize in US_SIZES:
-        db.session.add(models.ShoeSizeUs(value=usSize))
+        db.session.add(productsModels.ShoeSizeUs(value=usSize))
     for ukSize in UK_SIZES:
-        db.session.add(models.ShoeSizeUk(value=ukSize))
+        db.session.add(productsModels.ShoeSizeUk(value=ukSize))
     for cmSize in CM_SIZES:
-        db.session.add(models.ShoeSizeCm(value=cmSize))
+        db.session.add(productsModels.ShoeSizeCm(value=cmSize))
     for euSize in EU_SIZES:
-        db.session.add(models.ShoeSizeEu(value=euSize))
+        db.session.add(productsModels.ShoeSizeEu(value=euSize))
 
 
 def addGenderRecordsToSession():
     for gender in GENDERS:
-        db.session.add(models.Gender(gender=gender))
+        db.session.add(productsModels.Gender(gender=gender))
 
 
 def addEshopRecordsToSession():
     for eshop in ESHOPS:
-        db.session.add(models.Eshop(**eshop))
+        db.session.add(productsModels.Eshop(**eshop))
 
 
 if __name__ == "__main__":

@@ -77,7 +77,7 @@ class ProductData(db.Model):
     final_price = db.Column(db.Float, nullable=False)
     original_price = db.Column(db.Float, nullable=True)
     percent_off = db.Column(db.Float, nullable=True)
-    out_of_stock = db.Column(db.Boolean, nullable=True)
+    out_of_stock = db.Column(db.Boolean, nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
     eshop_id = db.Column(db.Integer, db.ForeignKey("eshops.id"), nullable=False)
     shoe_sizes_eu = relationship(
