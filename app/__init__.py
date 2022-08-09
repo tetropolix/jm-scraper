@@ -1,7 +1,7 @@
 from app.config import config
 from flask import Flask
 from app.errorHandlers import notFound
-from .extensions import login_manager, db, migrate
+from .extensions import login_manager, db, migrate, cors
 import app.database  # register all models for migration
 
 
@@ -33,6 +33,9 @@ def create_app(config_name):
     # Errorhandlers
     app.errorhandler(404)(notFound)
 
+    # CORS
+    cors.init_app(app)
+
     # Auth
     login_manager.init_app(app)
 
@@ -41,5 +44,4 @@ def create_app(config_name):
 
     # Migrate
     migrate.init_app(app, db)
-
     return app
