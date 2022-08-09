@@ -1,17 +1,8 @@
-from flask import Flask
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 from app.config import config
-from os import environ
-from flask_migrate import Migrate
-
-
-ENVIRONMENT_TYPE = environ.get("ENV_TYPE")
-
-db = SQLAlchemy()
-migrate = Migrate()
-login_manager = LoginManager()
-login_manager.login_view = "auth_bp.login"
+from flask import Flask
+from app.errorHandlers import notFound
+from .extensions import login_manager, db, migrate
+import app.database  # register all models for migration
 
 
 class ConfigNameNotFoundError(Exception):
@@ -33,9 +24,14 @@ def create_app(config_name):
     # Blueprints
     from app.products import products_bp
     from app.auth import auth_bp
+    from app.profile import profile_bp
 
     app.register_blueprint(products_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(profile_bp)
+
+    # Errorhandlers
+    app.errorhandler(404)(notFound)
 
     # Auth
     login_manager.init_app(app)
@@ -45,7 +41,5 @@ def create_app(config_name):
 
     # Migrate
     migrate.init_app(app, db)
+
     return app
-
-
-app = create_app(ENVIRONMENT_TYPE)

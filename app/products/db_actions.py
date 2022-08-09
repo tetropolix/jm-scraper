@@ -1,6 +1,6 @@
-from typing import Dict, List, Optional
+from typing import List, Optional
 import werkzeug
-from app import db
+from app.extensions import db
 from app.products.models import (
     Brand,
     ProductData,

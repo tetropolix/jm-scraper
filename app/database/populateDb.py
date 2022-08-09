@@ -1,6 +1,8 @@
 from sqlalchemy.exc import IntegrityError
-from app.database import authModels, productsModels
-from app import db, app
+from app.database import profileModels, authModels, productsModels
+from app.extensions import db
+from os import environ
+from app import create_app
 
 
 US_SIZES = [
@@ -274,6 +276,8 @@ def addEshopRecordsToSession():
 
 
 if __name__ == "__main__":
+    ENVIRONMENT_TYPE = environ.get("ENV_TYPE")
+    app = create_app(ENVIRONMENT_TYPE)
     with app.app_context():
         db.session.begin()
         try:

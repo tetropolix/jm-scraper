@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship, configure_mappers
-from app import db
+from app.extensions import db
 
 shoe_size_eu_product_data = db.Table(
     "shoe_size_eu_product_data",

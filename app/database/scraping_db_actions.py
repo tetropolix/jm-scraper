@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List, Optional
-from app import db, create_app
+from app.extensions import db
 from app.products.models import (
     Brand,
     Eshop,
@@ -114,38 +114,3 @@ def getEshopsDict() -> dict:
     """
     eshops = queryEshops()
     return {eshop.domain: eshop.id for eshop in eshops}
-
-
-# TESTING PURPOSES
-if __name__ == "__main__":
-    sz = createShoeSize(
-        {
-            "us": ["7", "10.5", "4.5", "7.5", "6.5", "6", "5"],
-            "uk": [],
-            "cm": [],
-            "eu": ["38.5", "39", "38", "40", "36", "44", "36.5"],
-        }
-    )
-    sp = createShoeProduct(
-        {
-            "brandName": "str",
-            "name": "str",
-            "shoeId": "ABC",
-            "smallImageUrl": "str",
-            "url": "str",
-            "finalPrice": 15.9,
-            "originalPrice": 15.2,
-            "percentOff": 0.2,
-            "domain": "https://www.footshop.sk",
-            "eshopId": "str",
-            "outOfStock": True,
-            "shoeSize": sz,
-            "gender": ["Man", "Woman"],
-        }
-    )
-    app = create_app("developmentLocal")
-    with app.app_context():
-        eshops = getEshopsDict()
-        id = insertProduct(sp)
-        productDataId = insertProductData(id, sp, datetime.now(), eshops)
-        print(id, productDataId)
