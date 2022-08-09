@@ -24,7 +24,7 @@ def products():
     # Check content type of request
     if request.content_type != "application/json":
         return (
-            createErrorProductsResponse("Wrong content-type used").dict(),
+            createErrorProductsResponse("Wrong content-type used"),
             400,
         )
 
@@ -64,7 +64,7 @@ def products():
             500,
         )
     else:
-        return response.dict(), 200
+        return response, 200
 
 
 @products_bp.route("/product/<int:productId>", methods=["GET"])
@@ -84,4 +84,4 @@ def product(productId: int):
             500,
         )
     else:
-        return response.dict(), 200
+        return response, 200

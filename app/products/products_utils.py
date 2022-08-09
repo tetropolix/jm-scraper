@@ -96,7 +96,7 @@ def createProduct(product: dict, productData: dict) -> Optional[Product]:
         return None
 
 
-def createProductsResponse(result: dict) -> Optional[ProductsResponse]:
+def createProductsResponse(result: dict, to_dict=True) -> Optional[ProductsResponse]:
     try:
         products = [
             createProduct(product, productData)
@@ -110,7 +110,7 @@ def createProductsResponse(result: dict) -> Optional[ProductsResponse]:
                 "total_items": result["total_items"],
             }
         )
-        return productsResponse
+        return productsResponse.dict() if to_dict else productsResponse
     except ValidationError:
         return None
 
@@ -125,9 +125,10 @@ def createErrorProductsResponse(error_message: str, to_dict=True) -> ProductsRes
     return response.dict() if to_dict else response
 
 
-def createProductResponse(product: dict, productData: dict):
+def createProductResponse(product: dict, productData: dict, to_dict=True):
     try:
-        return ProductResponse(product=createProduct(product, productData))
+        productResponse = ProductResponse(product=createProduct(product, productData))
+        return productResponse.dict() if to_dict else productResponse
     except ValidationError:
         return None
 
