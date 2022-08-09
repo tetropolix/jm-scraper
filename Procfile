@@ -1,1 +1,1 @@
-web: gunicorn app.__main__:app
+gunicorn app:"create_app('$ENV_TYPE')"
