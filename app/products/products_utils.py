@@ -115,8 +115,28 @@ def createProductsResponse(result: dict) -> Optional[ProductsResponse]:
         return None
 
 
+def createErrorProductsResponse(error_message: str, to_dict=True) -> ProductsResponse:
+    response = ProductsResponse(
+        **{
+            "error": True,
+            "errorMessage": error_message,
+        }
+    )
+    return response.dict() if to_dict else response
+
+
 def createProductResponse(product: dict, productData: dict):
     try:
         return ProductResponse(product=createProduct(product, productData))
     except ValidationError:
         return None
+
+
+def createErrorProductResponse(error_message: str, to_dict=True) -> ProductsResponse:
+    response = ProductResponse(
+        **{
+            "error": True,
+            "errorMessage": error_message,
+        }
+    )
+    return response.dict() if to_dict else response

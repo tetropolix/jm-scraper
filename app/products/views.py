@@ -9,6 +9,8 @@ from .db_actions import (
 )
 from .products_utils import (
     checkIfFilterShoudBeApplied,
+    createErrorProductResponse,
+    createErrorProductsResponse,
     createFilterOptionsFromArgs,
     createProduct,
     createProductResponse,
@@ -21,13 +23,20 @@ from app.products import products_bp
 def products():
     # Check content type of request
     if request.content_type != "application/json":
-        abort(400, "Wrong content-type used")
+        return (
+            createErrorProductsResponse("Wrong content-type used").dict(),
+            400,
+        )
+
     args = request.get_json()
     # try to create valid request format from given body
     try:
         args = ProductsRequest(**args)
     except ValidationError:
-        abort(400, "Wrong filter parameters")
+        return (
+            createErrorProductsResponse("Wrong filter parameters"),
+            400,
+        )
     page = args.page or 1
     productsPerPage = args.productsPerPage or 20
     filterOptions = None
@@ -36,24 +45,22 @@ def products():
     if applyFilter:
         filterOptions = createFilterOptionsFromArgs(args)
     if applyFilter and filterOptions == None:
-        abort(404, "Cannot construct filter options!")
+        return (
+            createErrorProductsResponse("Cannot construct filter options!"),
+            400,
+        )
     # get paginated data
     result = paginateProductsWithProductData(
         page, productsPerPage, filterOptions=filterOptions
     )
     # error when accesing paginated data
     if result == None:
-        abort(404, "Page not found!")
+        return createErrorProductsResponse("Page not found!"), 404
     # creation of response from paginated data
     response = createProductsResponse(result)
     if response is None:
         return (
-            ProductsResponse(
-                **{
-                    "error": True,
-                    "errorMessage": "Server error occured while processing data",
-                }
-            ).dict(),
+            createErrorProductsResponse("Server error occured while processing data"),
             500,
         )
     else:
@@ -66,25 +73,14 @@ def product(productId: int):
     productData = queryLatestProductDataForProduct(product)
     # Product not found
     if product == None or productData == None:
-        return (
-            ProductResponse(
-                **{
-                    "error": True,
-                    "errorMessage": "Product was not found!",
-                }
-            ).dict(),
-            400,
-        )
+        return createErrorProductResponse("Product was not found!"), 400
     # Try to create product response from acuiared data
     response = createProductResponse(product, productData)
     if response is None:
         return (
-            ProductResponse(
-                **{
-                    "error": True,
-                    "errorMessage": "Server error occured while searching for product",
-                }
-            ).dict(),
+            createErrorProductsResponse(
+                "Server error occured while searching for product"
+            ),
             500,
         )
     else:
