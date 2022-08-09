@@ -3,10 +3,13 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from app.config import config
 from os import environ
+from flask_migrate import Migrate
+
 
 ENVIRONMENT_TYPE = environ.get("ENV_TYPE")
 
 db = SQLAlchemy()
+migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = "auth_bp.login"
 
@@ -39,6 +42,9 @@ def create_app(config_name):
 
     # Database
     db.init_app(app)
+
+    # Migrate
+    migrate.init_app(app, db)
     return app
 
 

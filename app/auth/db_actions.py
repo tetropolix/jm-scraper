@@ -8,5 +8,4 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-def queryUserByEmail(email: str) -> Optional[User]:
-    return User.query.filter_by(email=email).first()
+

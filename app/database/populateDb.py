@@ -2,6 +2,7 @@ from sqlalchemy.exc import IntegrityError
 from app.database import authModels, productsModels
 from app import db, app
 
+
 US_SIZES = [
     "1",
     "1.5",

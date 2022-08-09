@@ -1,4 +1,4 @@
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, configure_mappers
 from app import db
 
 shoe_size_eu_product_data = db.Table(
@@ -170,3 +170,6 @@ class Gender(db.Model):
 
     def __repr__(self):
         return "<Gender %s>" % self.gender
+
+
+configure_mappers()

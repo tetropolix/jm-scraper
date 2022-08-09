@@ -7,10 +7,16 @@
     <title>Document</title>
   </head>
   <body>
-    <form method="POST" action="/login">
+    <form method="POST" action="{{url_for('auth_bp.login',next=next)}}">
       {{ form.email }} <br />
       {{ form.password }} <br />{{ form.remember_me }}<br />
       <input type="submit" value="Submit" />
+    </form>
+    <form method="POST" action="/register">
+      {{ form.email }} <br />
+      {{ form.username }} <br />
+      {{ form.password }} <br />{{ form.remember_me }}<br />
+      <input type="submit" value="Register" />
     </form>
   </body>
 </html>

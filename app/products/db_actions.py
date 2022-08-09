@@ -3,10 +3,10 @@ import werkzeug
 from app import db
 from app.products.models import (
     Brand,
+    ProductData,
     Eshop,
     Gender,
     Product,
-    ProductData,
     ShoeSizeCm,
     ShoeSizeEu,
     ShoeSizeUk,
@@ -69,7 +69,11 @@ def createProductDataFilterConditions(filterOptions: Optional[FilterOptions]) ->
         conditions.append(ProductData.out_of_stock == outOfStock)
     if domain != None and domain != []:
         conditions.append(
-            ProductData.eshop.has(func.lower(Eshop.domain).in_(map(str.lower, domain)))
+            ProductData.eshop.has(Eshop.domain.ilike(domain))
+            if isinstance(domain, str)
+            else ProductData.eshop.has(
+                func.lower(Eshop.domain).in_(map(str.lower, domain))
+            )
         )
     if len(shoeSize.us) > 0:  # Note - not sure if working properly!
         conditions.append(
@@ -131,9 +135,11 @@ def queryProductById(id: int):
 
 
 def paginateProductsWithProductData(
-    page: int, productsPerPage: int, filterOptions: FilterOptions = None
-) -> Optional[Dict[Product, ProductData]]:
-    output = {}
+    page: int = 1, productsPerPage: int = 20, filterOptions: FilterOptions = None
+) -> Optional[dict]:
+    if productsPerPage < 1 or productsPerPage > 32:
+        None
+    output = {"products": {}}
     productConditions = createProductFilterConditions(filterOptions)
     productDataConditions = createProductDataFilterConditions(filterOptions)
     latestProductDataForProducts = (
@@ -165,5 +171,8 @@ def paginateProductsWithProductData(
             product, conditions=productDataConditions
         )
         if productData != None:
-            output[product] = productData
+            output["products"][product] = productData
+    output["current_page"] = products.page
+    output["total_pages"] = products.pages
+    output["total_items"] = products.total
     return output
