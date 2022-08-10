@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from typing import List, Set, Optional, Literal, Union
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, validator
+from app.general_schemas import ErrorResponse
 
 # REQUESTS
 class ProductsRequest(BaseModel):
@@ -78,9 +79,6 @@ class Product(BaseModel):
 
 
 # RESPONSE
-class ErrorResponse(BaseModel):
-    error: bool = False
-    errorMessage: Optional[str]
 
 
 class ProductsResponse(ErrorResponse):
@@ -94,4 +92,4 @@ class ProductResponse(ErrorResponse):
     product: Optional[Product]
 
 
-#######################
+########################

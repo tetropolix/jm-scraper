@@ -3,7 +3,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 
-cors = CORS()
+cors = CORS(
+    resources={
+        r"/products": {
+            "origins": "http://localhost:4200",
+            "methods": ["POST", "OPTIONS"],
+        },
+        r"/products/*": {
+            "origins": "http://localhost:4200",
+            "methods": ["POST", "OPTIONS"],
+        },
+    }
+)
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()

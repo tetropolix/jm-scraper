@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Email
 from app.auth.db_actions import (
+    create_user_with_profile,
     load_user,
 )  # load_user import is used for registering user_loader callback required by flask_login
 from flask_login import login_user, logout_user, current_user
@@ -33,8 +34,8 @@ def login():
         next = request.args.get("next")
         return render_template("login_form.html", form=form, next=next)
     else:
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = request.json.get("email")
+        password = request.json.get("password")
         next = (
             None if request.args.get("next") in (None, "") else request.args.get("next")
         )
@@ -61,7 +62,7 @@ def login():
                     200,
                 )
             elif next and not is_safe_url(next):
-                return LoginLogoutResponse(error="Redirect url is not safe"), 400
+                return LoginLogoutResponse(error="Redirect url is not safe").dict(), 400
         return LoginLogoutResponse(error="User not found or wrong password").json(), 200
 
 
@@ -84,7 +85,7 @@ def register():
     else:
         try:
             newUser = User(email=email, username=username, password=password)
-            newUser.save()
+            create_user_with_profile(newUser)
             userSchemaObj = UserSchema(email=email, username=username)
             response = RegisterReponse(registered=True, user=userSchemaObj)
             return response.json(), 200

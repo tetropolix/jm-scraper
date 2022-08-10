@@ -13,7 +13,7 @@ class Config:
 class DevelopmentLocalConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI_DEV_LOCAL")
-    PERMANENT_SESSION_LIFETIME = 5
+    PERMANENT_SESSION_LIFETIME = 600
 
 
 class DevelopmentRemoteConfig(Config):

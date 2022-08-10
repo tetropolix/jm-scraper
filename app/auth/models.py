@@ -37,9 +37,5 @@ class User(UserMixin, db.Model):
     def query_by_email(cls: Type[T], email: str) -> Optional[T]:
         return cls.query.filter_by(email=email).first()
 
-    def save(self) -> int:
-        db.session.add(self)
-        db.session.commit()
-        return self.id
 
 configure_mappers()

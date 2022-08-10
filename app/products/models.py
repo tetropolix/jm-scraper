@@ -50,7 +50,8 @@ class Product(db.Model):
     )
 
     def __repr__(self):
-        return "<Product (%s) with brand reference to (%d) >" % (
+        return "<Product with id (%d) (%s) with brand reference to (%d) >" % (
+            self.id,
             self.name,
             self.brand_id,
         )
