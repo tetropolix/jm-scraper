@@ -1,4 +1,4 @@
-from flask import abort, request
+from flask import request
 from pydantic import ValidationError
 
 from app.products.schemas import ProductResponse, ProductsRequest, ProductsResponse
@@ -17,26 +17,20 @@ from .products_utils import (
     createProductsResponse,
 )
 from app.products import products_bp
+from app.common.custom_responses import StatusCodeResponse
 
 
 @products_bp.route("/products", methods=["POST"])
 def products():
     # Check content type of request
     if request.content_type != "application/json":
-        return (
-            createErrorProductsResponse("Wrong content-type used"),
-            400,
-        )
-
+        return StatusCodeResponse(400)
     args = request.get_json()
     # try to create valid request format from given body
     try:
         args = ProductsRequest(**args)
     except ValidationError:
-        return (
-            createErrorProductsResponse("Wrong filter parameters"),
-            400,
-        )
+        return StatusCodeResponse(400)
     page = args.page or 1
     productsPerPage = args.productsPerPage or 20
     filterOptions = None
@@ -45,24 +39,18 @@ def products():
     if applyFilter:
         filterOptions = createFilterOptionsFromArgs(args)
     if applyFilter and filterOptions == None:
-        return (
-            createErrorProductsResponse("Cannot construct filter options!"),
-            400,
-        )
+        return StatusCodeResponse(400)
     # get paginated data
     result = paginateProductsWithProductData(
         page, productsPerPage, filterOptions=filterOptions
     )
     # error when accesing paginated data
     if result == None:
-        return createErrorProductsResponse("Page not found!"), 404
+        return StatusCodeResponse(404)
     # creation of response from paginated data
     response = createProductsResponse(result)
     if response is None:
-        return (
-            createErrorProductsResponse("Server error occured while processing data"),
-            500,
-        )
+        return StatusCodeResponse(500)
     else:
         return response, 200
 
@@ -73,15 +61,10 @@ def product(productId: int):
     productData = queryLatestProductDataForProduct(product)
     # Product not found
     if product == None or productData == None:
-        return createErrorProductResponse("Product was not found!"), 400
+        return StatusCodeResponse(400)
     # Try to create product response from acuiared data
     response = createProductResponse(product, productData)
     if response is None:
-        return (
-            createErrorProductsResponse(
-                "Server error occured while searching for product"
-            ),
-            500,
-        )
+        return StatusCodeResponse(500)
     else:
         return response, 200

@@ -1,16 +1,15 @@
 from sqlalchemy.exc import IntegrityError
 from app.auth import auth_bp
 from flask_login import login_required
-from flask import render_template, request, abort, session
+from flask import render_template, request, session
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Email
 from app.auth.db_actions import (
     create_user_with_profile,
-    load_user,
 )  # load_user import is used for registering user_loader callback required by flask_login
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user
 from app.auth.models import User
 from app.auth.schemas import (
     RegisterReponse,
@@ -18,6 +17,7 @@ from app.auth.schemas import (
     LoginLogoutResponse,
 )
 from app.auth.auth_utils import is_safe_url
+from app.common.custom_responses import StatusCodeResponse
 
 
 class LoginForm(FlaskForm):
@@ -40,7 +40,7 @@ def login():
             None if request.args.get("next") in (None, "") else request.args.get("next")
         )
         if not email or not password:
-            abort(400)
+            return StatusCodeResponse(400)
         user = User.query_by_email(email)
         if user is not None and user.verify_password(password):
             logged = login_user(user)
@@ -62,7 +62,7 @@ def login():
                     200,
                 )
             elif next and not is_safe_url(next):
-                return LoginLogoutResponse(error="Redirect url is not safe").dict(), 400
+                return StatusCodeResponse(400)
         return LoginLogoutResponse(error="User not found or wrong password").json(), 200
 
 
@@ -90,10 +90,7 @@ def register():
             response = RegisterReponse(registered=True, user=userSchemaObj)
             return response.json(), 200
         except IntegrityError:
-            response = RegisterReponse(
-                error="Cannot create user with specified parameters"
-            )
-            return response.json(), 500
+            return StatusCodeResponse(500)
 
 
 @auth_bp.before_request
