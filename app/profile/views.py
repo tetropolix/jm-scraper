@@ -7,6 +7,7 @@ from app.profile import profile_bp
 from app.profile.db_actions import (
     add_products_for_profile,
     remove_products_from_profile,
+    verify_max_products_per_profile,
 )
 from app.profile.schemas import ProductRequest
 from .profile_utils import createErrorProductResponse
@@ -24,6 +25,15 @@ def add_product():
         args = ProductRequest(**args)
     except ValidationError:
         return createErrorProductResponse("Wrong request body format"), 400
+    # Check for maximum products per profile
+    add_products = verify_max_products_per_profile(args, current_user)
+    if not add_products:
+        return (
+            createErrorProductResponse(
+                "Asked amount of products would exceed maximum products per profile"
+            ),
+            200,
+        )
     added_product_ids = add_products_for_profile(args, current_user)
     added = True if len(added_product_ids) > 0 else 0
     return createProductResponse(added_product_ids, added), 200

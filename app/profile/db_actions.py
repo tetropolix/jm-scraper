@@ -5,6 +5,11 @@ from app.extensions import db
 from typing import List
 
 
+def verify_max_products_per_profile(request: ProductRequest, user: User) -> bool:
+    user_profile = user.profile
+    return len(request.product_ids) + len(user_profile.products) <= 20
+
+
 def add_products_for_profile(request: ProductRequest, user: User) -> List[int]:
     product_ids = (
         request.product_ids

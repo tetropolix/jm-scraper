@@ -6,11 +6,11 @@ from flask_cors import CORS
 cors = CORS(
     resources={
         r"/products": {
-            "origins": "http://localhost:4200",
+            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app/"],
             "methods": ["POST", "OPTIONS"],
         },
         r"/products/*": {
-            "origins": "http://localhost:4200",
+            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app/"],
             "methods": ["POST", "OPTIONS"],
         },
     }
