@@ -1,5 +1,7 @@
-from typing import List, Set, Optional, Literal, Union
-from pydantic import BaseModel, ValidationError, root_validator
+from typing import Optional
+from pydantic import BaseModel
+
+from app.common.general_schemas import BaseModelDocumentable
 
 
 class User(BaseModel):
@@ -7,14 +9,14 @@ class User(BaseModel):
     username: str
 
 
-class LoginLogoutResponse(BaseModel):
+class LoginLogoutResponse(BaseModelDocumentable):
     logged: bool = False
     error: Optional[str] = None
     next: Optional[str] = None
     user: Optional[User] = None
 
 
-class RegisterReponse(BaseModel):
+class RegisterResponse(BaseModelDocumentable):
     registered: bool = False
     error: Optional[str] = None
     user: Optional[User] = None

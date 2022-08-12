@@ -1,7 +1,9 @@
 from flask import request
 from pydantic import ValidationError
+from app.common.decorators import register_route
 
-from app.products.schemas import ProductResponse, ProductsRequest, ProductsResponse
+from app.products.schemas.request_schemas import ProductsRequest
+from app.products.schemas.response_schemas import ProductResponse, ProductsResponse
 from .db_actions import (
     paginateProductsWithProductData,
     queryLatestProductDataForProduct,
@@ -9,30 +11,31 @@ from .db_actions import (
 )
 from .products_utils import (
     checkIfFilterShoudBeApplied,
-    createErrorProductResponse,
-    createErrorProductsResponse,
     createFilterOptionsFromArgs,
-    createProduct,
     createProductResponse,
     createProductsResponse,
 )
 from app.products import products_bp
 from app.common.custom_responses import StatusCodeResponse
 
+DEFAULT_PAGE = 1
+DEFAULT_PRODUCTS_PER_PAGE = 20
 
-@products_bp.route("/products", methods=["POST"])
+
+@register_route(
+    products_bp, "/products", ProductsRequest, ProductsResponse, methods=["POST"]
+)
 def products():
-    # Check content type of request
-    if request.content_type != "application/json":
-        return StatusCodeResponse(400)
+    """Returns products based on filter options provided (if any)"""
+    # try to parse json in body of request
     args = request.get_json()
     # try to create valid request format from given body
     try:
         args = ProductsRequest(**args)
     except ValidationError:
         return StatusCodeResponse(400)
-    page = args.page or 1
-    productsPerPage = args.productsPerPage or 20
+    page = args.page or DEFAULT_PAGE
+    productsPerPage = args.productsPerPage or DEFAULT_PRODUCTS_PER_PAGE
     filterOptions = None
     # check for filter and create filter options if necessary
     applyFilter = checkIfFilterShoudBeApplied(args)
@@ -55,8 +58,11 @@ def products():
         return response, 200
 
 
-@products_bp.route("/product/<int:productId>", methods=["GET"])
+@register_route(
+    products_bp, "/product/<int:productId>", None, ProductResponse, methods=["GET"]
+)
 def product(productId: int):
+    """Returns product by ID specified as part of URL"""
     product = queryProductById(productId)
     productData = queryLatestProductDataForProduct(product)
     # Product not found

@@ -1,10 +1,10 @@
-from datetime import date, datetime
 from typing import List, Set, Optional, Literal, Union
-from pydantic import BaseModel, validator
-from app.general_schemas import ErrorResponse
+from pydantic import validator
 
-# REQUESTS
-class ProductsRequest(BaseModel):
+from app.common.general_schemas import BaseModelDocumentable
+
+
+class ProductsRequest(BaseModelDocumentable):
     page: Optional[int]
     productsPerPage: Optional[int]
     brandName: Optional[Union[str, List[str]]]
@@ -48,48 +48,3 @@ class ProductsRequest(BaseModel):
         if v < 0:
             raise ValueError("maxPrice must be positive")
         return v
-
-
-#####################
-
-# UTILS
-
-
-class ProductData(BaseModel):
-    scrapedAt: datetime
-    finalPrice: float
-    originalPrice: float
-    percentOff: float
-    outOfStock: bool
-    sizes_us: List[str] = []
-    sizes_uk: List[str] = []
-    sizes_eu: List[str] = []
-    sizes_cm: List[str] = []
-
-
-class Product(BaseModel):
-    name: str
-    brand: str
-    productImageUrl: str
-    id: int
-    productData: ProductData
-
-
-######################
-
-
-# RESPONSE
-
-
-class ProductsResponse(ErrorResponse):
-    products: List[Product] = []
-    current_page: int = 0
-    total_pages: int = 0
-    total_items: int = 0
-
-
-class ProductResponse(ErrorResponse):
-    product: Optional[Product]
-
-
-########################

@@ -12,12 +12,13 @@ from app.auth.db_actions import (
 from flask_login import login_user, logout_user
 from app.auth.models import User
 from app.auth.schemas import (
-    RegisterReponse,
+    RegisterResponse,
     User as UserSchema,
     LoginLogoutResponse,
 )
 from app.auth.auth_utils import is_safe_url
 from app.common.custom_responses import StatusCodeResponse
+from app.common.decorators import register_route
 
 
 class LoginForm(FlaskForm):
@@ -27,7 +28,13 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField("Keep me logged in")
 
 
-@auth_bp.route("/login", methods=["GET", "POST"])
+@register_route(
+    auth_bp,
+    "/login",
+    request=None,
+    response=LoginLogoutResponse,
+    methods=["GET", "POST"],
+)
 def login():
     form = LoginForm()
     if request.method == "GET":
@@ -66,28 +73,40 @@ def login():
         return LoginLogoutResponse(error="User not found or wrong password").json(), 200
 
 
-@auth_bp.route("/logout", methods=["GET"])
+@register_route(
+    auth_bp,
+    "/logout",
+    request=None,
+    response=LoginLogoutResponse,
+    methods=["GET"],
+)
 @login_required
 def logout():
     logout_user()
     return LoginLogoutResponse(logged=False, error=None, user=None).json(), 200
 
 
-@auth_bp.route("/register", methods=["POST"])
+@register_route(
+    auth_bp,
+    "/register",
+    request=None,
+    response=RegisterResponse,
+    methods=["POST"],
+)
 def register():
     email = request.form.get("email")
     username = request.form.get("username")
     password = request.form.get("password")
     user = User.query_by_email(email)
     if user is not None:
-        response = RegisterReponse(error="Specified email is already in use")
+        response = RegisterResponse(error="Specified email is already in use")
         return response.json(), 200
     else:
         try:
             newUser = User(email=email, username=username, password=password)
             create_user_with_profile(newUser)
             userSchemaObj = UserSchema(email=email, username=username)
-            response = RegisterReponse(registered=True, user=userSchemaObj)
+            response = RegisterResponse(registered=True, user=userSchemaObj)
             return response.json(), 200
         except IntegrityError:
             return StatusCodeResponse(500)

@@ -1,5 +1,7 @@
 import json
-from flask import Response, jsonify
+from typing import Optional
+from flask import Response
+from sqlalchemy import desc
 
 
 class BaseJSONResponse(Response):

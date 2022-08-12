@@ -3,6 +3,7 @@ from flask import request
 from flask_login import current_user, login_required
 from pydantic import ValidationError
 from app.common.custom_responses import StatusCodeResponse
+from app.common.decorators import register_route
 from app.profile.profile_utils import createProductResponse
 from app.profile import profile_bp
 from app.profile.db_actions import (
@@ -10,11 +11,17 @@ from app.profile.db_actions import (
     remove_products_from_profile,
     verify_max_products_per_profile,
 )
-from app.profile.schemas import ProductRequest
+from app.profile.schemas import ProductRequest, ProductResponse
 from .profile_utils import createErrorProductResponse
 
 
-@profile_bp.route("/addProduct", methods=["POST"])
+@register_route(
+    profile_bp,
+    "/addProduct",
+    request=ProductRequest,
+    response=ProductResponse,
+    methods=["POST"],
+)
 @login_required
 def add_product():
     # Check content type of request
@@ -35,7 +42,13 @@ def add_product():
     return createProductResponse(added_product_ids, added), 200
 
 
-@profile_bp.route("/removeProduct", methods=["POST"])
+@register_route(
+    profile_bp,
+    "/removeProduct",
+    request=ProductRequest,
+    response=ProductResponse,
+    methods=["POST"],
+)
 @login_required
 def remove_product():
     # Check content type of request

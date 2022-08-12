@@ -165,3 +165,4 @@ scrapedData.json
 temp_storage
 scraping/*
 !scraping/schemas.py
+scripts

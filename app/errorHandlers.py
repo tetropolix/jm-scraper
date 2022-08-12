@@ -1,5 +1,8 @@
 from flask import render_template
 
+from app.common.custom_responses import StatusCodeResponse
 
-def notFound(e):
-    return render_template("404.html", errorMessage=e.description), 404
+
+def handler_400(e):
+    print(e)
+    return StatusCodeResponse(400)

@@ -1,7 +1,7 @@
 from app.config import config
 from flask import Flask
-from app.errorHandlers import notFound
-from .extensions import login_manager, db, migrate, cors
+from app.errorHandlers import handler_400
+from .extensions import development_docs, login_manager, db, migrate, cors
 import app.database  # register all models for migration
 
 
@@ -30,8 +30,11 @@ def create_app(config_name):
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
 
+    # Development docs
+    if app.config.get("SHOW_DOCS"):
+        app.route("/api-docs", methods=["GET"])(development_docs(app))
     # Errorhandlers
-    app.errorhandler(404)(notFound)
+    app.errorhandler(400)(handler_400)
 
     # CORS
     cors.init_app(app)
