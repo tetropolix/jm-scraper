@@ -1,5 +1,5 @@
+from app.profile.schemas.request_schemas import ProductRequest
 from app.products.models import Product
-from app.profile.schemas import ProductRequest
 from app.auth.models import User
 from app.extensions import db
 from typing import List

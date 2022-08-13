@@ -1,4 +1,4 @@
-from .schemas import ProductResponse
+from app.profile.schemas.response_schemas import ProductResponse
 from typing import Optional, Union, List
 from pydantic import ValidationError
 
