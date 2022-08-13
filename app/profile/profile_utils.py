@@ -16,13 +16,3 @@ def createProductResponse(
         return response.dict() if to_dict else response
     except ValidationError:
         return None
-
-
-def createErrorProductResponse(error_message: str, to_dict=True) -> ProductResponse:
-    response = ProductResponse(
-        **{
-            "error": True,
-            "errorMessage": error_message,
-        }
-    )
-    return response.dict() if to_dict else response

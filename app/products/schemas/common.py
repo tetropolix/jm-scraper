@@ -21,3 +21,10 @@ class Product(BaseModel):
     productImageUrl: str
     id: int
     productData: ProductData
+
+
+class ShoeSizes(BaseModel):
+    us: List[str] = list()
+    uk: List[str] = list()
+    cm: List[str] = list()
+    eu: List[str] = list()

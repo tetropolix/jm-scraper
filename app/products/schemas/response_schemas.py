@@ -1,6 +1,7 @@
-from typing import List, Optional
-from app.common.general_schemas import BaseModelDocumentable
-from .common import Product
+from ctypes import Union
+from typing import List, Literal, Optional
+from app.common.custom_classes import BaseModelDocumentable
+from .common import Product, ShoeSizes
 
 
 class ProductsResponse(BaseModelDocumentable):
@@ -12,3 +13,15 @@ class ProductsResponse(BaseModelDocumentable):
 
 class ProductResponse(BaseModelDocumentable):
     product: Optional[Product]
+
+
+class FiltersResponse(BaseModelDocumentable):
+    brandName: List[str] = []
+    minPrice: float = 0
+    maxPrice: float = 0
+    maxPercentOff: float = 0
+    isSomethingOutOfStock: bool = False
+    isSomethingInStock: bool = False
+    shoeSizes: ShoeSizes = ShoeSizes()
+    genders: List[Literal["Man", "Woman", "Kids", "Unknown"]] = []
+    domains: List[str] = []

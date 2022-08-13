@@ -1,5 +1,5 @@
-from typing import List, Optional
-from pydantic import BaseModel, validator
+from typing import Optional
+from pydantic import BaseModel
 
 
 class SingletonClass(object):
@@ -60,14 +60,3 @@ class DocumentedApp(SingletonClass):
             if res:
                 schema_dict[key]["response"] = res.generate_schema()
         return schema_dict
-
-
-class ErrorResponse(BaseModel):
-    error: bool = False
-    errorMessage: Optional[str]
-
-    @validator("errorMessage")
-    def valid_page_number(cls, v, values):
-        if values["error"] == True and len(v) < 1:
-            raise ValueError("If error is set to true, error message cannot be empty")
-        return v

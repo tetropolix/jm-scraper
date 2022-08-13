@@ -1,11 +1,17 @@
 from flask import request
 from pydantic import ValidationError
 from app.common.decorators import register_route
+from .schemas.common import ShoeSizes
 
 from app.products.schemas.request_schemas import ProductsRequest
-from app.products.schemas.response_schemas import ProductResponse, ProductsResponse
+from app.products.schemas.response_schemas import (
+    FiltersResponse,
+    ProductResponse,
+    ProductsResponse,
+)
 from .db_actions import (
     paginateProductsWithProductData,
+    query_filter_options,
     queryLatestProductDataForProduct,
     queryProductById,
 )
@@ -74,3 +80,17 @@ def product(productId: int):
         return StatusCodeResponse(500)
     else:
         return response, 200
+
+
+@register_route(
+    products_bp, "/products/filters", None, FiltersResponse, methods=["GET"]
+)
+def filters():
+    """Returns filter options which can be used for filtering specified range of products"""
+    filter_options_dict = query_filter_options()
+    try:
+        return FiltersResponse(**filter_options_dict).dict()
+    except ValidationError:
+        return StatusCodeResponse(
+            500, "INTERNAL SERVER ERROR - Unable to provide filter options"
+        )

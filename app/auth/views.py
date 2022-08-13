@@ -1,76 +1,56 @@
+from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
 from app.auth import auth_bp
 from flask_login import login_required
-from flask import render_template, request, session
-
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Length, Email
+from flask import request, session
 from app.auth.db_actions import (
     create_user_with_profile,
 )  # load_user import is used for registering user_loader callback required by flask_login
 from flask_login import login_user, logout_user
 from app.auth.models import User
-from app.auth.schemas import (
-    RegisterResponse,
-    User as UserSchema,
-    LoginLogoutResponse,
-)
-from app.auth.auth_utils import is_safe_url
+from app.auth.auth_utils import is_safe_url, valid_email
+from .schemas.response_schemas import LoginLogoutResponse, RegisterResponse
+from .schemas.request_schemas import LoginRequest, RegisterRequest
 from app.common.custom_responses import StatusCodeResponse
 from app.common.decorators import register_route
-
-
-class LoginForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Length(1, 64), Email()])
-    username = StringField("Username", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    remember_me = BooleanField("Keep me logged in")
+from app.auth.schemas.common import User as UserSchema
 
 
 @register_route(
     auth_bp,
     "/login",
-    request=None,
+    request=LoginRequest,
     response=LoginLogoutResponse,
-    methods=["GET", "POST"],
+    methods=["POST"],
 )
 def login():
-    form = LoginForm()
-    if request.method == "GET":
-        next = request.args.get("next")
-        return render_template("login_form.html", form=form, next=next)
-    else:
-        email = request.json.get("email")
-        password = request.json.get("password")
-        next = (
-            None if request.args.get("next") in (None, "") else request.args.get("next")
-        )
-        if not email or not password:
+    """Logs in user with specified credentials"""
+    args = request.get_json()
+    try:
+        login_req = LoginRequest(**args)
+    except ValidationError:
+        return StatusCodeResponse(400)
+    next = None if request.args.get("next") in (None, "") else request.args.get("next")
+    email = login_req.email
+    password = login_req.password
+    if not email or not password:
+        return StatusCodeResponse(400)
+    user = User.query_by_email(email)
+    if user is not None and user.verify_password(password):
+        logged = login_user(user)
+        if not logged:
+            return StatusCodeResponse(500)
+        userSchemaObj = UserSchema(email=user.email, username=user.username)
+        if next is None:
+            return LoginLogoutResponse(logged=True, user=userSchemaObj).dict(), 200
+        elif next and is_safe_url(next):
+            return (
+                LoginLogoutResponse(logged=True, user=userSchemaObj, next=next).dict(),
+                200,
+            )
+        elif next and not is_safe_url(next):
             return StatusCodeResponse(400)
-        user = User.query_by_email(email)
-        if user is not None and user.verify_password(password):
-            logged = login_user(user)
-            if not logged:
-                return (
-                    LoginLogoutResponse(
-                        logged=False, error="Unable to log in user", user=None
-                    ).json(),
-                    500,
-                )
-            userSchemaObj = UserSchema(email=user.email, username=user.username)
-            if next is None:
-                return LoginLogoutResponse(logged=True, user=userSchemaObj).json(), 200
-            elif next and is_safe_url(next):
-                return (
-                    LoginLogoutResponse(
-                        logged=True, user=userSchemaObj, next=next
-                    ).json(),
-                    200,
-                )
-            elif next and not is_safe_url(next):
-                return StatusCodeResponse(400)
-        return LoginLogoutResponse(error="User not found or wrong password").json(), 200
+    return LoginLogoutResponse().dict(), 200
 
 
 @register_route(
@@ -82,34 +62,47 @@ def login():
 )
 @login_required
 def logout():
+    """Logs out currently logged user"""
     logout_user()
-    return LoginLogoutResponse(logged=False, error=None, user=None).json(), 200
+    return LoginLogoutResponse(logged=False, user=None).dict(), 200
 
 
 @register_route(
     auth_bp,
     "/register",
-    request=None,
+    request=RegisterRequest,
     response=RegisterResponse,
     methods=["POST"],
 )
 def register():
-    email = request.form.get("email")
-    username = request.form.get("username")
-    password = request.form.get("password")
+    """Register new user with specified credentials"""
+    args = request.get_json()
+    try:
+        register_req = RegisterRequest(**args)
+    except ValidationError:
+        return StatusCodeResponse(400)
+    email = register_req.email
+    username = register_req.username
+    password = register_req.password
+    retry_password = register_req.retryPassword
     user = User.query_by_email(email)
     if user is not None:
-        response = RegisterResponse(error="Specified email is already in use")
-        return response.json(), 200
-    else:
-        try:
-            newUser = User(email=email, username=username, password=password)
-            create_user_with_profile(newUser)
-            userSchemaObj = UserSchema(email=email, username=username)
-            response = RegisterResponse(registered=True, user=userSchemaObj)
-            return response.json(), 200
-        except IntegrityError:
-            return StatusCodeResponse(500)
+        return RegisterResponse(errorOnRegister="EMAIL_IN_USE").dict(), 200
+    elif valid_email(email) == None:
+        return RegisterResponse(errorOnRegister="INVALID_EMAIL").dict(), 200
+    elif len(username) == 0:
+        return RegisterResponse(errorOnRegister="EMPTY_USERNAME").dict(), 200
+    elif len(password) < 8:
+        return RegisterResponse(errorOnRegister="SHORT_PASSWORD").dict(), 200
+    elif password != retry_password:
+        return RegisterResponse(errorOnRegister="PASSWORD_NO_MATCH").dict(), 200
+    try:
+        newUser = User(email=email, username=username, password=password)
+        create_user_with_profile(newUser)
+        userSchemaObj = UserSchema(email=email, username=username)
+        return RegisterResponse(registered=True, user=userSchemaObj).dict(), 200
+    except IntegrityError:
+        return StatusCodeResponse(500)
 
 
 @auth_bp.before_request

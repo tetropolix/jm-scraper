@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 
-from app.common.general_schemas import DocumentedApp
+from app.common.custom_classes import DocumentedApp
 
 cors = CORS(
     resources={

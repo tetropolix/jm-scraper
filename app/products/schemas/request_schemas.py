@@ -1,7 +1,7 @@
 from typing import List, Set, Optional, Literal, Union
 from pydantic import validator
 
-from app.common.general_schemas import BaseModelDocumentable
+from app.common.custom_classes import BaseModelDocumentable
 
 
 class ProductsRequest(BaseModelDocumentable):

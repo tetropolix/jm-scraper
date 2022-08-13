@@ -1,6 +1,7 @@
 from typing import Optional
 from black import Any
-from app.common.general_schemas import BaseModelDocumentable, DocumentedApp
+from app.common.custom_classes import BaseModelDocumentable, DocumentedApp
+from functools import wraps
 
 
 def register_route(
@@ -11,16 +12,15 @@ def register_route(
     document: bool = True,
     **options: Any
 ):
-    def decorator(func):
+    def decorator(function):
         if document:
-            print("decorator", rule)
             DocumentedApp.add_endpoint(
                 endpoint=rule,
                 request=request,
                 response=response,
-                description=func.__doc__,
+                description=function.__doc__,
             )
-        func = bp_or_app.route(rule=rule, **options)(func)
-        return func
+        function = bp_or_app.route(rule=rule, **options)(function)
+        return function
 
     return decorator

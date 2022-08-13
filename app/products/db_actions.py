@@ -176,3 +176,33 @@ def paginateProductsWithProductData(
     output["total_pages"] = products.pages
     output["total_items"] = products.total
     return output
+
+
+def get_latest_product_data() -> List[ProductData]:
+    return ProductData.query.order_by(ProductData.scraped_at.desc()).all()
+
+
+def query_filter_options() -> dict:
+    res = {}
+    latest_product_data = get_latest_product_data()
+    res["brandName"] = [brand.name for brand in Brand.query.all()]
+    res["maxPrice"] = max((pd.final_price for pd in latest_product_data), default=0)
+    res["minPrice"] = min((pd.final_price for pd in latest_product_data), default=0)
+    res["maxPercentOff"] = max(
+        (pd.percent_off for pd in latest_product_data), default=0
+    )
+    res["isSomethingOutOfStock"] = next(
+        (True for pd in latest_product_data if pd.out_of_stock), False
+    )
+    res["isSomethingInStock"] = next(
+        (True for pd in latest_product_data if not pd.out_of_stock), False
+    )
+    res["shoeSizes"] = {
+        "us": [size.value for size in ShoeSizeUs.query.all()],
+        "uk": [size.value for size in ShoeSizeUk.query.all()],
+        "eu": [size.value for size in ShoeSizeEu.query.all()],
+        "cm": [size.value for size in ShoeSizeCm.query.all()],
+    }
+    res["genders"] = [g.gender for g in Gender.query.all()]
+    res["domains"] = [eshop.domain for eshop in Eshop.query.all()]
+    return res
