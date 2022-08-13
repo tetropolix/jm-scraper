@@ -51,12 +51,13 @@ class DocumentedApp(SingletonClass):
     @classmethod
     def schema(cls) -> dict:
         schema_dict = {}
+        do_not_copy = {"request", "response"}
         for key, value in cls.ENDPOINTS.items():
-            schema_dict[key] = value
+            schema_dict[key] = {k: value[k] for k in value if k not in do_not_copy}
             req = value.get("request")
             res = value.get("response")
             if req:
                 schema_dict[key]["request"] = req.generate_schema()
             if res:
-                schema_dict[key]["response"] = res.generate_schema()
+                schema_dict[key]["response  "] = res.generate_schema()
         return schema_dict
