@@ -13,9 +13,15 @@ def register_route(
     **options: Any
 ):
     def decorator(function):
+        try:
+            prefix = bp_or_app.url_prefix
+            if prefix is None:
+                prefix = ""
+        except AttributeError:
+            prefix = ""
         if document:
             DocumentedApp.add_endpoint(
-                endpoint=rule,
+                endpoint=prefix + rule,
                 request=request,
                 response=response,
                 description=function.__doc__,

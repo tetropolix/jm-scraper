@@ -29,7 +29,7 @@ class Profile(db.Model):
         "Gender", secondary=profile_gender, lazy="subquery", backref="profiles"
     )
     products = relationship(
-        "Product", secondary=profile_product, lazy="subquery", backref="prof    "
+        "Product", secondary=profile_product, lazy="subquery", backref="profiles"
     )
 
     @classmethod
@@ -39,6 +39,16 @@ class Profile(db.Model):
     @classmethod
     def query_by_user_id(cls, user_id: int):
         return cls.query.filter_by(id=id).first()
+
+    def get_profile_dict(self) -> id:
+        return {
+            "birth_date": self.birth_date,
+            "avatar_uri": self.avatar_uri,
+            "genders": [g.gender for g in self.genders],
+            "product_ids": [prod.id for prod in self.products],
+            "id": self.id,
+            "user_id": self.user_id,
+        }
 
 
 configure_mappers()

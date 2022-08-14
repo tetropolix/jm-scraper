@@ -29,7 +29,7 @@ DEFAULT_PRODUCTS_PER_PAGE = 20
 
 
 @register_route(
-    products_bp, "/products", ProductsRequest, ProductsResponse, methods=["POST"]
+    products_bp, "", ProductsRequest, ProductsResponse, methods=["POST"]
 )
 def products():
     """Returns products based on filter options provided (if any)"""
@@ -65,7 +65,7 @@ def products():
 
 
 @register_route(
-    products_bp, "/product/<int:productId>", None, ProductResponse, methods=["GET"]
+    products_bp, "/<int:productId>", None, ProductResponse, methods=["GET"]
 )
 def product(productId: int):
     """Returns product by ID specified as part of URL"""
@@ -83,7 +83,7 @@ def product(productId: int):
 
 
 @register_route(
-    products_bp, "/products/filters", None, FiltersResponse, methods=["GET"]
+    products_bp, "/filters", None, FiltersResponse, methods=["GET"]
 )
 def filters():
     """Returns filter options which can be used for filtering specified range of products"""
