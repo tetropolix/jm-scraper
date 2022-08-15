@@ -8,11 +8,11 @@ from app.common.custom_classes import DocumentedApp
 cors = CORS(
     resources={
         r"/products": {
-            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
+            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app/*"],
             "methods": ["POST", "OPTIONS"],
         },
         r"/products/*": {
-            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
+            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app/*"],
             "methods": ["POST", "OPTIONS"],
         },
     }
