@@ -8,11 +8,11 @@ cors = CORS(
     resources={
         r"/products": {
             "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
-            "methods": ["POST", "OPTIONS"],
+            "methods": ["POST", "OPTIONS","GET"],
         },
         r"/products/*": {
             "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
-            "methods": ["POST", "OPTIONS"],
+            "methods": ["POST", "OPTIONS","GET"],
         },
         r"/auth/*": {
             "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
