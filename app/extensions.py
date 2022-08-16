@@ -2,7 +2,6 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-
 from app.common.custom_classes import DocumentedApp
 
 cors = CORS(
@@ -11,7 +10,11 @@ cors = CORS(
             "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
             "methods": ["POST", "OPTIONS"],
         },
-        r"/products/*": {
+        r"/auth": {
+            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
+            "methods": ["GET", "POST", "OPTIONS"],
+        },
+        r"/profile": {
             "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
             "methods": ["GET", "POST", "OPTIONS"],
         },

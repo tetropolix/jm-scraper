@@ -1,5 +1,6 @@
+import sys
 from sqlalchemy.exc import IntegrityError
-from app.database import profileModels, authModels, productsModels
+from app import profileModels, authModels, productsModels
 from app.extensions import db
 from os import environ
 from app import create_app

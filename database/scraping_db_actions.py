@@ -12,7 +12,7 @@ from app.products.models import (
     ShoeSizeUk,
     ShoeSizeUs,
 )
-from scraping.schemas import ShoeProduct, ShoeSize, createShoeProduct, createShoeSize
+from scraping.schemas import ShoeProduct, ShoeSize
 
 
 def insertBrand(brandName: str) -> int:
