@@ -25,7 +25,7 @@ def createProductFilterConditions(filterOptions: Optional[FilterOptions]) -> Lis
         "brandName", "name", "gender"
     )(filterOptions)
     if name != None:
-        conditions.append(Product.name.ilike(filterOptions.name))
+        conditions.append(Product.name.ilike("%" + filterOptions.name + "%"))
     if brandName != None and brandName != []:
         conditions.append(
             Product.brand.has(Brand.name.ilike(brandName))

@@ -1,7 +1,6 @@
 from flask import request
 from pydantic import ValidationError
 from app.common.decorators import register_route
-from .schemas.common import ShoeSizes
 
 from app.products.schemas.request_schemas import ProductsRequest
 from app.products.schemas.response_schemas import (
@@ -28,9 +27,7 @@ DEFAULT_PAGE = 1
 DEFAULT_PRODUCTS_PER_PAGE = 20
 
 
-@register_route(
-    products_bp, "", ProductsRequest, ProductsResponse, methods=["POST"]
-)
+@register_route(products_bp, "", ProductsRequest, ProductsResponse, methods=["POST"])
 def products():
     """Returns products based on filter options provided (if any)"""
     # try to parse json in body of request
@@ -64,9 +61,7 @@ def products():
         return response, 200
 
 
-@register_route(
-    products_bp, "/<int:productId>", None, ProductResponse, methods=["GET"]
-)
+@register_route(products_bp, "/<int:productId>", None, ProductResponse, methods=["GET"])
 def product(productId: int):
     """Returns product by ID specified as part of URL"""
     product = queryProductById(productId)
@@ -82,9 +77,7 @@ def product(productId: int):
         return response, 200
 
 
-@register_route(
-    products_bp, "/filters", None, FiltersResponse, methods=["GET"]
-)
+@register_route(products_bp, "/filters", None, FiltersResponse, methods=["GET"])
 def filters():
     """Returns filter options which can be used for filtering specified range of products"""
     filter_options_dict = query_filter_options()

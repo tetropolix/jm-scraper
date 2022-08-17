@@ -1,7 +1,7 @@
-from datetime import datetime
-from typing import List, Literal, Optional
+from typing import List, Optional
 
 from app.common.custom_classes import BaseModelDocumentable
+from .common import UserProfile
 
 
 class ProductResponse(BaseModelDocumentable):
@@ -11,7 +11,4 @@ class ProductResponse(BaseModelDocumentable):
 
 
 class UserProfileResponse(BaseModelDocumentable):
-    birth_date: Optional[datetime]
-    avatar_uri: Optional[str]
-    genders: List[Literal["Man", "Woman", "Kids", "Unknown"]]
-    product_ids: List[int] = []
+    profile: UserProfile

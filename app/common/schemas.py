@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel
+from .custom_classes import BaseModelDocumentable
 
 
-class ProductData(BaseModel):
+class ProductData(BaseModelDocumentable):
     scrapedAt: datetime
     finalPrice: float
     originalPrice: float
@@ -15,7 +15,7 @@ class ProductData(BaseModel):
     sizes_cm: List[str] = []
 
 
-class Product(BaseModel):
+class Product(BaseModelDocumentable):
     name: str
     brand: str
     productImageUrl: str
@@ -23,8 +23,15 @@ class Product(BaseModel):
     productData: ProductData
 
 
-class ShoeSizes(BaseModel):
+class ShoeSizes(BaseModelDocumentable):
     us: List[str] = list()
     uk: List[str] = list()
     cm: List[str] = list()
     eu: List[str] = list()
+
+
+class ProductWithoutProductData(BaseModelDocumentable):
+    name: str
+    brand: str
+    productImageUrl: str
+    id: int

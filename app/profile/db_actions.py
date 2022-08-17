@@ -60,3 +60,5 @@ def update_user_profile_info(request: UpdateUserProfileRequest, user: User) -> P
         user_profile.birth_date = request.birth_date
     db.session.commit()
     return user_profile
+
+

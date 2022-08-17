@@ -1,4 +1,4 @@
-from sqlalchemy.orm import configure_mappers, relationship
+from sqlalchemy.orm import configure_mappers, relationship, backref
 from app.extensions import db
 from app.auth.models import User
 from app.products.models import (
@@ -14,7 +14,7 @@ predefined_profile_filters_shoe_size_us = db.Table(
     "predefined_profile_filters_shoe_size_us",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -24,7 +24,7 @@ predefined_profile_filters_shoe_size_uk = db.Table(
     "predefined_profile_filters_shoe_size_uk",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -34,7 +34,7 @@ predefined_profile_filters_shoe_size_cm = db.Table(
     "predefined_profile_filters_shoe_size_cm",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -44,7 +44,7 @@ predefined_profile_filters_shoe_size_eu = db.Table(
     "predefined_profile_filters_shoe_size_eu",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -55,7 +55,7 @@ predefined_profile_filters_brand = db.Table(
     "predefined_profile_filters_brand",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -66,7 +66,7 @@ predefined_profile_filters_gender = db.Table(
     "predefined_profile_filters_gender",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -77,7 +77,7 @@ predefined_profile_filters_eshop = db.Table(
     "predefined_profile_filters_eshop",
     db.Column("id", db.Integer, primary_key=True),
     db.Column(
-        "predefined_profile_filters",
+        "predefined_profile_filters_id",
         db.Integer,
         db.ForeignKey("predefined_profile_filters.id"),
     ),
@@ -106,44 +106,44 @@ class PredefinedProfileFilters(db.Model):
     max_price = db.Column(db.Numeric(6, 2), nullable=True)
     min_price = db.Column(db.Numeric(6, 2), nullable=True)
     percent_off = db.Column(db.Numeric(4, 2), nullable=True)
-    out_of_stock: db.Column(db.Boolean, nullable=True)
-    shoe_size_us: relationship(
-        "ShoeSizeEu",
+    out_of_stock = db.Column(db.Boolean, nullable=False, default=False)
+    shoe_size_us = relationship(
+        "ShoeSizeUs",
         secondary=predefined_profile_filters_shoe_size_us,
         lazy="subquery",
         backref="predefined_profile_filters",
     )
-    shoe_size_uk: relationship(
+    shoe_size_uk = relationship(
         "ShoeSizeUk",
         secondary=predefined_profile_filters_shoe_size_uk,
         lazy="subquery",
         backref="predefined_profile_filters",
     )
-    shoe_size_eu: relationship(
-        "ShoeSizeUs",
+    shoe_size_eu = relationship(
+        "ShoeSizeEu",
         secondary=predefined_profile_filters_shoe_size_eu,
         lazy="subquery",
         backref="predefined_profile_filters",
     )
-    shoe_size_cm: relationship(
+    shoe_size_cm = relationship(
         "ShoeSizeCm",
         secondary=predefined_profile_filters_shoe_size_cm,
         lazy="subquery",
         backref="predefined_profile_filters",
     )
-    genders: relationship(
+    genders = relationship(
         "Gender",
         secondary=predefined_profile_filters_gender,
         lazy="subquery",
         backref="predefined_profile_filters",
     )
-    eshops: relationship(
+    eshops = relationship(
         "Eshop",
         secondary=predefined_profile_filters_eshop,
         lazy="subquery",
         backref="predefined_profile_filters",
     )
-    brands: relationship(
+    brands = relationship(
         "Brand",
         secondary=predefined_profile_filters_brand,
         lazy="subquery",
@@ -161,7 +161,7 @@ class Profile(db.Model):
     )
     gender = relationship("Gender", backref="profile", uselist=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = relationship("User", backref="profile", uselist=False)
+    user = relationship("User", backref=backref("profile", uselist=False))
     send_notifications = db.Column(db.Boolean, nullable=False, default=False)
     products = relationship(
         "Product", secondary=profile_product, lazy="subquery", backref="profiles"
@@ -176,17 +176,7 @@ class Profile(db.Model):
 
     @classmethod
     def query_by_user_id(cls, user_id: int):
-        return cls.query.filter_by(id=id).first()
-
-    def get_profile_dict(self) -> id:
-        return {
-            "birth_date": self.birth_date,
-            "avatar_uri": self.avatar_uri,
-            "genders": [g.gender for g in self.genders],
-            "product_ids": [prod.id for prod in self.products],
-            "id": self.id,
-            "user_id": self.user_id,
-        }
+        return cls.query.filter_by(id=user_id).first()
 
 
 configure_mappers()

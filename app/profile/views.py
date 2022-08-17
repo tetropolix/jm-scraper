@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from app.common.custom_responses import StatusCodeResponse
 from app.common.decorators import register_route
 from .models import Profile
-from app.profile.profile_utils import createProductResponse
+from app.profile.profile_utils import createProductResponse, get_user_profile_dict
 from app.profile import profile_bp
 from app.profile.db_actions import (
     add_products_for_profile,
@@ -27,11 +27,11 @@ from app.profile.schemas.response_schemas import ProductResponse, UserProfileRes
 @login_required
 def get_user_profile():
     """Returns ALL profile info for currently logged in user"""
-    profile: Profile = current_user.profile
-    profile_dict = profile.get_profile_dict()
+    user_profile_dict = get_user_profile_dict(current_user)
     try:
-        return UserProfileResponse(**profile_dict).dict(), 200
-    except ValidationError:
+        return UserProfileResponse(**{"profile": user_profile_dict}).dict(), 200
+    except ValidationError as e:
+        print(e)
         return StatusCodeResponse(500)
 
 

@@ -1,7 +1,7 @@
 from ctypes import Union
 from typing import List, Literal, Optional
 from app.common.custom_classes import BaseModelDocumentable
-from .common import Product, ShoeSizes
+from app.common.schemas import Product, ShoeSizes
 
 
 class ProductsResponse(BaseModelDocumentable):

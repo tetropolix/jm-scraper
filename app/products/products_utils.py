@@ -2,10 +2,9 @@ from pydantic import ValidationError
 from app.products.schemas import (
     ProductResponse,
     ProductsRequest,
-    Product,
-    ProductData,
     ProductsResponse,
 )
+from app.common.schemas import Product, ProductData
 from scraping.schemas import (
     FilterOptions,
     createFilterOptions,
