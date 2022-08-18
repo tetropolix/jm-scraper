@@ -154,6 +154,7 @@ class PredefinedProfileFilters(db.Model):
 class Profile(db.Model):
     __tablename__ = "profiles"
     id = db.Column(db.Integer, primary_key=True)
+    max_products = db.Column(db.Integer, nullable=False, default=20)
     birth_date = db.Column(db.DateTime, nullable=True, default=None)
     avatar_uri = db.Column(db.String(256), nullable=True, default=None)
     gender_id = db.Column(

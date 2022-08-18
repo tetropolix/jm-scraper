@@ -25,7 +25,6 @@ class RegisterResponse(BaseModelDocumentable):
 
     @validator("errorOnRegister")
     def is_registered_false_on_error_message(cls, v, values):
-        print(values)
         if v is not None and values["registered"]:
             raise ValueError(
                 "Error message cannot be set when registered is set to True"

@@ -20,6 +20,7 @@ class PredefinedProfileFilters(BaseModelDocumentable):
 
 
 class UserProfile(BaseModelDocumentable):
+    maxProducts: int
     birthDate: Optional[datetime] = None
     avatarUri: Optional[str] = None
     gender: Optional[Literal["Man", "Woman", "Kids", "Unknown"]] = None

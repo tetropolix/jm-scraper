@@ -1,13 +1,14 @@
 from typing import List, Optional
 
 from app.common.custom_classes import BaseModelDocumentable
+from app.common.schemas import ProductWithoutProductData
 from .common import UserProfile
 
 
-class ProductResponse(BaseModelDocumentable):
-    added: bool = False
-    removed: bool = False
-    product_ids: Optional[List[int]] = None
+class UserProfileProductsResponse(BaseModelDocumentable):
+    maxProductsForProfile: int
+    numberOfAffectedProducts: int
+    products: List[ProductWithoutProductData] = []
 
 
 class UserProfileResponse(BaseModelDocumentable):
