@@ -2,6 +2,7 @@ from typing import List, Set, Optional, Literal, Union
 from pydantic import validator
 
 from app.common.custom_classes import BaseModelDocumentable
+from .common import ProductsSort
 
 
 class ProductsRequest(BaseModelDocumentable):
@@ -24,6 +25,7 @@ class ProductsRequest(BaseModelDocumentable):
         ]
     ]
     domain: Optional[Union[str, List[str]]]
+    productsSort: Optional[ProductsSort]
 
     @validator("page")
     def valid_page_number(cls, v):

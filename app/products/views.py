@@ -48,7 +48,10 @@ def products():
         return StatusCodeResponse(400)
     # get paginated data
     result = paginateProductsWithProductData(
-        page, productsPerPage, filterOptions=filterOptions
+        page,
+        productsPerPage,
+        filterOptions=filterOptions,
+        sortOptions=args.productsSort,
     )
     # error when accesing paginated data
     if result == None:

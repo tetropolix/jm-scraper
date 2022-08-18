@@ -1,16 +1,21 @@
 from pydantic import ValidationError
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, MultipleResultsFound
 from app.auth import auth_bp
 from flask_login import login_required
 from flask import request, session
 from app.auth.db_actions import (
     create_user_with_profile,
+    is_email_in_use,
 )  # load_user import is used for registering user_loader callback required by flask_login
 from flask_login import login_user, logout_user
 from app.auth.models import User
 from app.auth.auth_utils import is_safe_url, valid_email
-from .schemas.response_schemas import LoginLogoutResponse, RegisterResponse
-from .schemas.request_schemas import LoginRequest, RegisterRequest
+from .schemas.response_schemas import (
+    CheckEmailResponse,
+    LoginLogoutResponse,
+    RegisterResponse,
+)
+from .schemas.request_schemas import CheckEmailRequest, LoginRequest, RegisterRequest
 from app.common.custom_responses import StatusCodeResponse
 from app.common.decorators import register_route
 from app.auth.schemas.common import User as UserSchema
@@ -102,6 +107,26 @@ def register():
         userSchemaObj = UserSchema(email=email, username=username)
         return RegisterResponse(registered=True, user=userSchemaObj).dict(), 200
     except IntegrityError:
+        return StatusCodeResponse(500)
+
+
+@register_route(
+    auth_bp,
+    "/isEmailUsed",
+    request=CheckEmailRequest,
+    response=CheckEmailResponse,
+    methods=["POST"],
+)
+def is_email_used():
+    """Endpoint for checking if provided email is already in use"""
+    args = request.get_json()
+    try:
+        req = CheckEmailRequest(**args)
+    except ValidationError:
+        return StatusCodeResponse(400)
+    try:
+        return CheckEmailResponse(**{"isUsed": is_email_in_use(req.email)}).dict(), 200
+    except MultipleResultsFound:
         return StatusCodeResponse(500)
 
 

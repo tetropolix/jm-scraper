@@ -30,3 +30,7 @@ class RegisterResponse(BaseModelDocumentable):
                 "Error message cannot be set when registered is set to True"
             )
         return v
+
+
+class CheckEmailResponse(BaseModelDocumentable):
+    isUsed: bool

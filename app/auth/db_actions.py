@@ -17,3 +17,7 @@ def create_user_with_profile(user: User) -> int:
     db.session.add(user)
     db.session.commit()
     return user.id
+
+
+def is_email_in_use(email: str):
+    return User.query.filter(User.email == email).scalar() is not None

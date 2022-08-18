@@ -34,7 +34,7 @@ def checkIfFilterShoudBeApplied(args: dict) -> bool:
     return False
 
 
-def createFilterOptionsFromArgs(args: ProductsRequest) -> Optional[FilterOptions]:
+def createFilterOptionsFromArgs(args: ProductsRequest) -> FilterOptions:
     shoeSize = createShoeSize(
         {
             "us": args.size_us if args.size_us else set(),
@@ -56,7 +56,7 @@ def createFilterOptionsFromArgs(args: ProductsRequest) -> Optional[FilterOptions
             "domain": args.domain,
         }
     )
-    return filterOptions if all([shoeSize, filterOptions]) else None
+    return filterOptions
 
 
 def createProduct(product: dict, productData: dict) -> Optional[Product]:

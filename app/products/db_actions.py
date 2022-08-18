@@ -12,9 +12,25 @@ from app.products.models import (
     ShoeSizeUk,
     ShoeSizeUs,
 )
+from .schemas.common import ProductsSort
 from scraping.schemas import FilterOptions
 from operator import attrgetter
 from sqlalchemy import func
+
+
+def createSortConditionsForProducts(sort_options: Optional[ProductsSort]) -> List:
+    sort_conditions = []
+    if sort_options is None:
+        return sort_conditions
+    if sort_options.priceAsc:
+        sort_conditions.append(ProductData.final_price.asc())
+    elif sort_options.priceDesc:
+        sort_conditions.append(ProductData.final_price.desc())
+    if sort_options.percentOffAsc:
+        sort_conditions.append(ProductData.percent_off.asc())
+    elif sort_options.percentOffDesc:
+        sort_conditions.append(ProductData.percent_off.desc())
+    return sort_conditions
 
 
 def createProductFilterConditions(filterOptions: Optional[FilterOptions]) -> List:
@@ -135,32 +151,38 @@ def queryProductById(id: int):
 
 
 def paginateProductsWithProductData(
-    page: int = 1, productsPerPage: int = 20, filterOptions: FilterOptions = None
+    page: int = 1,
+    productsPerPage: int = 20,
+    filterOptions: FilterOptions = None,
+    sortOptions: ProductsSort = None,
 ) -> Optional[dict]:
     if productsPerPage < 1 or productsPerPage > 32:
         None
     output = {"products": {}}
     productConditions = createProductFilterConditions(filterOptions)
     productDataConditions = createProductDataFilterConditions(filterOptions)
-    latestProductDataForProducts = (
-        db.session.query(func.max(ProductData.scraped_at), ProductData.product_id)
-        .group_by(ProductData.product_id)
-        .all()
-    )
+    sortConditions = createSortConditionsForProducts(sortOptions)
+    latestProductDataForProducts = db.session.query(
+        func.max(ProductData.scraped_at), ProductData.product_id
+    ).group_by(ProductData.product_id)
     productsQuery = (
-        Product.query.distinct()
-        .filter(*productConditions)
-        .join(Product.product_data)
-        .filter(
-            *productDataConditions,
-        )
-    ).filter(
-        Product.id.in_(
-            map(
-                lambda productData: productData.product_id,
-                latestProductDataForProducts,
+        (
+            Product.query.distinct()
+            .filter(*productConditions)
+            .join(ProductData, Product.id == ProductData.product_id)
+            .filter(
+                *productDataConditions,
             )
         )
+        .filter(
+            Product.id.in_(
+                map(
+                    lambda productData: productData.product_id,
+                    latestProductDataForProducts,
+                )
+            )
+        )
+        .order_by(*sortConditions)
     )
     try:
         products = productsQuery.paginate(page=page, per_page=productsPerPage)
