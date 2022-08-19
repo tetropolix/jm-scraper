@@ -1,14 +1,14 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from .custom_classes import BaseModelDocumentable
 
 
 class ProductData(BaseModelDocumentable):
     scrapedAt: datetime
     finalPrice: float
-    originalPrice: float
-    percentOff: float
-    outOfStock: bool
+    originalPrice: Optional[float]
+    percentOff: Optional[float]
+    outOfStock: bool = False
     sizes_us: List[str] = []
     sizes_uk: List[str] = []
     sizes_eu: List[str] = []

@@ -91,7 +91,7 @@ def createProduct(product: dict, productData: dict) -> Optional[Product]:
             }
         )
         return product
-    except ValidationError:
+    except ValidationError as e:
         return None
 
 
@@ -110,7 +110,7 @@ def createProductsResponse(result: dict, to_dict=True) -> Optional[ProductsRespo
             }
         )
         return productsResponse.dict() if to_dict else productsResponse
-    except ValidationError:
+    except ValidationError as e:
         return None
 
 
