@@ -13,20 +13,24 @@ def register_route(
     **options: Any
 ):
     def decorator(function):
-        try:
-            prefix = bp_or_app.url_prefix
-            if prefix is None:
+        @wraps(function)
+        def enhanced_fn():
+            try:
+                prefix = bp_or_app.url_prefix
+                if prefix is None:
+                    prefix = ""
+            except AttributeError:
                 prefix = ""
-        except AttributeError:
-            prefix = ""
-        if document:
-            DocumentedApp.add_endpoint(
-                endpoint=prefix + rule,
-                request=request,
-                response=response,
-                description=function.__doc__,
-            )
-        function = bp_or_app.route(rule=rule, **options)(function)
-        return function
+            if document:
+                DocumentedApp.add_endpoint(
+                    endpoint=prefix + rule,
+                    request=request,
+                    response=response,
+                    description=function.__doc__,
+                )
+            function = bp_or_app.route(rule=rule, **options)(function)
+            return function
+
+        return enhanced_fn()
 
     return decorator
