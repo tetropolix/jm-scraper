@@ -166,3 +166,4 @@ temp_storage
 scraping/*
 !scraping/schemas.py
 scripts
+test.html

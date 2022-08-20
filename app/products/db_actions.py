@@ -74,11 +74,11 @@ def createProductDataFilterConditions(filterOptions: Optional[FilterOptions]) ->
         "domain",
     )(filterOptions)
     if minPrice != None and maxPrice != None:
-        conditions.append(ProductData.original_price.between(minPrice, maxPrice))
+        conditions.append(ProductData.final_price.between(minPrice, maxPrice))
     elif minPrice != None:
-        conditions.append(ProductData.original_price >= minPrice)
+        conditions.append(ProductData.final_price >= minPrice)
     elif maxPrice != None:
-        conditions.append(ProductData.original_price <= maxPrice)
+        conditions.append(ProductData.final_price <= maxPrice)
     if percentOff != None:
         conditions.append(ProductData.percent_off >= percentOff)
     if outOfStock != None:
