@@ -13,6 +13,33 @@ def register_route(
     **options: Any
 ):
     def decorator(function):
+        try:
+            prefix = bp_or_app.url_prefix
+            if prefix is None:
+                prefix = ""
+        except AttributeError:
+            prefix = ""
+        if document:
+            DocumentedApp.add_endpoint(
+                endpoint=prefix + rule,
+                request=request,
+                response=response,
+                description=function.__doc__,
+            )
+        function = bp_or_app.route(rule=rule, **options)(function)
+        return function
+
+    return decorator
+
+""" def register_route(
+    bp_or_app,
+    rule: str,
+    request: Optional[BaseModelDocumentable],
+    response: Optional[BaseModelDocumentable],
+    document: bool = True,
+    **options: Any
+):
+    def decorator(function):
         @wraps(function)
         def enhanced_fn():
             try:
@@ -33,4 +60,4 @@ def register_route(
 
         return enhanced_fn()
 
-    return decorator
+    return decorator """
