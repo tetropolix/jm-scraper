@@ -6,6 +6,7 @@ from flask import request, session
 from app.auth.db_actions import (
     create_user_with_profile,
     is_email_in_use,
+    load_user,
 )  # load_user import is used for registering user_loader callback required by flask_login
 from flask_login import login_user, logout_user
 from app.auth.models import User
