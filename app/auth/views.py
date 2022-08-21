@@ -1,5 +1,7 @@
+from crypt import methods
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, MultipleResultsFound
+from app import auth
 from app.auth import auth_bp
 from flask_login import login_required
 from flask import request, session
@@ -59,13 +61,16 @@ def login():
     return LoginLogoutResponse().dict(), 200
 
 
-@register_route(
+""" @register_route(
     auth_bp,
     "/logout",
     request=None,
     response=LoginLogoutResponse,
     methods=["GET"],
-)
+) """
+
+
+@auth_bp.route("/logout", methods=["GET"])
 @login_required
 def logout():
     """Logs out currently logged user"""
