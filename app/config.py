@@ -8,7 +8,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     #PERMANENT_SESSION_LIFETIME = int(os.environ.get("PERMANENT_SESSION_LIFETIME"))
-
+    SERVER_NAME= 'shoescraper01.herokuapp.com'
 
 class DevelopmentLocalConfig(Config):
     DEBUG = True

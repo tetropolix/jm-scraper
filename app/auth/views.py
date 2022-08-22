@@ -138,8 +138,14 @@ def is_email_used():
 
 @auth_bp.before_request
 def reload_session():
+    print("user id in session BEFORE REQUEST",session.get("_user_id"))
     if "_user_id" in session:
         session.modified = True
+
+@auth_bp.after_request
+def print_after_session(response):
+    print("user id in session AFTER REQUEST",session.get("_user_id"))
+    return response
 
 
 @auth_bp.route("/test", methods=["GET"])
