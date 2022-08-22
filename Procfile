@@ -1,1 +1,1 @@
-web: gunicorn app:"create_app('$ENV_TYPE')" --preload
+web: gunicorn -w 1 app:"create_app('$ENV_TYPE')" --preload
