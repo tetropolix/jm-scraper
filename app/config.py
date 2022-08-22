@@ -8,9 +8,8 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PERMANENT_SESSION_LIFETIME = int(os.environ.get("PERMANENT_SESSION_LIFETIME"))
-    # SERVER_NAME= 'shoescraper01.herokuapp.com'
+    SESSION_COOKIE_DOMAIN = 'dev.localhost'
     SESSION_COOKIE_SAMESITE = None
-    SESSION_COOKIE_SECURE = True
 
 
 class DevelopmentLocalConfig(Config):
@@ -22,6 +21,9 @@ class DevelopmentLocalConfig(Config):
 class DevelopmentRemoteConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI_DEV_REMOTE")
     SHOW_DOCS = True
+    SESSION_COOKIE_DOMAIN = 'herokuapp.com'
+    SESSION_COOKIE_SAMESITE = None
+    SESSION_COOKIE_SECURE = True
 
 
 config = {
