@@ -9,8 +9,6 @@ from app.extensions import db
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(int(user_id))
-    print("USER LOADER - ", user)
-    sys.stdout.flush()
     return user
 
 
