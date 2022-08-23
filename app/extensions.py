@@ -2,6 +2,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_session import Session
 from app.common.custom_classes import DocumentedApp
 
 cors = CORS(
@@ -24,11 +25,20 @@ cors = CORS(
         },
     },
     supports_credentials=True,
+    allow_headers=[
+        "Origin",
+        "X-Requested-With",
+        "Content-Type",
+        "Accept",
+        "access-control-allow-origin",
+        "access-control-allow-headers",
+    ],
 )
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = "auth_bp.login"
+session = Session()
 
 
 def development_docs(app):

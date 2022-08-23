@@ -61,6 +61,20 @@ def login():
     return LoginLogoutResponse().dict(), 200
 
 
+@auth_bp.route("getLogin", methods=["GET"])
+def get_login():
+    email = "local@gmail.com"
+    password = "Aaaaaaaa1!"
+    user = User.query_by_email(email)
+    if user is not None and user.verify_password(password):
+        logged = login_user(user)
+        if not logged:
+            return StatusCodeResponse(500)
+        userSchemaObj = UserSchema(email=user.email, username=user.username)
+        return LoginLogoutResponse(logged=True, user=userSchemaObj).dict(), 200
+    return LoginLogoutResponse().dict(), 200
+
+
 """ @register_route(
     auth_bp,
     "/logout",
@@ -138,13 +152,14 @@ def is_email_used():
 
 @auth_bp.before_request
 def reload_session():
-    print("user id in session BEFORE REQUEST",session.get("_user_id"))
+    print("user id in session BEFORE REQUEST", session.get("_user_id"))
     if "_user_id" in session:
         session.modified = True
 
+
 @auth_bp.after_request
 def print_after_session(response):
-    print("user id in session AFTER REQUEST",session.get("_user_id"))
+    print("user id in session AFTER REQUEST", session.get("_user_id"))
     return response
 
 

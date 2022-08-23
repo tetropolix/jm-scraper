@@ -1,7 +1,7 @@
 from app.config import config
 from flask import Flask
 from app.errorHandlers import handler_400
-from .extensions import development_docs, login_manager, db, migrate, cors
+from .extensions import development_docs, login_manager, db, migrate, cors, session
 from app.auth import models as authModels
 from app.products import models as productsModels
 from app.profile import models as profileModels  # register all models for migration
@@ -43,6 +43,9 @@ def create_app(config_name):
 
     # Auth
     login_manager.init_app(app)
+
+    # session
+    session.init_app(app)
 
     # Database
     db.init_app(app)

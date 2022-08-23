@@ -167,3 +167,4 @@ scraping/*
 !scraping/schemas.py
 scripts
 test.html
+flask_session
