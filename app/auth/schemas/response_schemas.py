@@ -34,3 +34,8 @@ class RegisterResponse(BaseModelDocumentable):
 
 class CheckEmailResponse(BaseModelDocumentable):
     isUsed: bool
+
+
+class UnauthorizedResponse(BaseModelDocumentable):
+    next: str
+    handled: bool = True

@@ -24,6 +24,7 @@ class DevelopmentRemoteConfig(Config):
     SHOW_DOCS = True
     SESSION_COOKIE_SAMESITE = os.environ.get("SESSION_COOKIE_SAMESITE")
     SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE")
+    SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN")
 
 
 config = {

@@ -5,7 +5,7 @@ from functools import wraps
 
 
 def register_route(
-    bp_or_app,
+    bp_or_app: Optional[Any],
     rule: str,
     request: Optional[BaseModelDocumentable],
     response: Optional[BaseModelDocumentable],
@@ -26,7 +26,10 @@ def register_route(
                 response=response,
                 description=function.__doc__,
             )
-        function = wraps(bp_or_app.route(rule=rule, **options)(function))
+        if bp_or_app is not None:
+            function = wraps(bp_or_app.route(rule=rule, **options)(function))
+        else:
+            function = wraps(function)
         return function
 
     return decorator

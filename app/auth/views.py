@@ -17,11 +17,26 @@ from .schemas.response_schemas import (
     CheckEmailResponse,
     LoginLogoutResponse,
     RegisterResponse,
+    UnauthorizedResponse,
 )
+from app.extensions import login_manager
 from .schemas.request_schemas import CheckEmailRequest, LoginRequest, RegisterRequest
 from app.common.custom_responses import StatusCodeResponse
 from app.common.decorators import register_route
 from app.auth.schemas.common import User as UserSchema
+
+
+@register_route(
+    None,
+    "*unauthorized*",
+    request=None,
+    response=UnauthorizedResponse,
+    methods=[],
+)
+@login_manager.unauthorized_handler
+def unauthorized():
+    """Response for handled unauthorized access via user login"""
+    return UnauthorizedResponse(**{"next": request.url_rule.rule}).dict(), 401
 
 
 @register_route(
@@ -59,29 +74,6 @@ def login():
         elif next and not is_safe_url(next):
             return StatusCodeResponse(400)
     return LoginLogoutResponse().dict(), 200
-
-
-@auth_bp.route("getLogin", methods=["GET"])
-def get_login():
-    email = "local@gmail.com"
-    password = "Aaaaaaaa1!"
-    user = User.query_by_email(email)
-    if user is not None and user.verify_password(password):
-        logged = login_user(user)
-        if not logged:
-            return StatusCodeResponse(500)
-        userSchemaObj = UserSchema(email=user.email, username=user.username)
-        return LoginLogoutResponse(logged=True, user=userSchemaObj).dict(), 200
-    return LoginLogoutResponse().dict(), 200
-
-
-""" @register_route(
-    auth_bp,
-    "/logout",
-    request=None,
-    response=LoginLogoutResponse,
-    methods=["GET"],
-) """
 
 
 @auth_bp.route("/logout", methods=["GET"])
@@ -148,13 +140,6 @@ def is_email_used():
         return CheckEmailResponse(**{"isUsed": is_email_in_use(req.email)}).dict(), 200
     except MultipleResultsFound:
         return StatusCodeResponse(500)
-
-
-@auth_bp.before_request
-def reload_session():
-    print("user id in session BEFORE REQUEST", session.get("_user_id"))
-    if "_user_id" in session:
-        session.modified = True
 
 
 @auth_bp.after_request

@@ -1,5 +1,4 @@
 from flask import request
-
 from flask_login import current_user, login_required
 from psycopg2 import IntegrityError
 from pydantic import ValidationError
@@ -24,6 +23,7 @@ from app.profile.schemas.response_schemas import (
     UserProfileProductsResponse,
     UserProfileResponse,
 )
+
 
 
 @register_route(
