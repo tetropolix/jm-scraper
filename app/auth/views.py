@@ -1,17 +1,13 @@
-from crypt import methods
+from datetime import datetime, timedelta
+from typing import Optional
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, MultipleResultsFound
-from app import auth
 from app.auth import auth_bp
-from flask_login import login_required
-from flask import request, session
-from app.auth.db_actions import (
-    create_user_with_profile,
-    is_email_in_use,
-    load_user,
-)  # load_user import is used for registering user_loader callback required by flask_login
+from flask_login import login_required, current_user
+from flask import request, session, current_app
+from app.auth.db_actions import auth_user, create_user_with_profile, is_email_in_use
 from flask_login import login_user, logout_user
-from app.auth.models import User
+from app.auth.models import User, UserSession
 from app.auth.auth_utils import is_safe_url, valid_email
 from .schemas.response_schemas import (
     CheckEmailResponse,
@@ -24,6 +20,13 @@ from .schemas.request_schemas import CheckEmailRequest, LoginRequest, RegisterRe
 from app.common.custom_responses import StatusCodeResponse
 from app.common.decorators import register_route
 from app.auth.schemas.common import User as UserSchema
+from app.extensions import db
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = User.query.get(int(user_id))
+    return user
 
 
 @register_route(
@@ -64,15 +67,15 @@ def login():
         if not logged:
             return StatusCodeResponse(500)
         userSchemaObj = UserSchema(email=user.email, username=user.username)
-        if next is None:
-            return LoginLogoutResponse(logged=True, user=userSchemaObj).dict(), 200
-        elif next and is_safe_url(next):
-            return (
-                LoginLogoutResponse(logged=True, user=userSchemaObj, next=next).dict(),
-                200,
-            )
-        elif next and not is_safe_url(next):
+        if next and not is_safe_url(next):
             return StatusCodeResponse(400)
+        elif next and is_safe_url(next):  # if next is okay just pass
+            pass
+        auth_user(user, True)
+        return (
+            LoginLogoutResponse(logged=True, user=userSchemaObj, next=next).dict(),
+            200,
+        )
     return LoginLogoutResponse().dict(), 200
 
 
@@ -80,6 +83,8 @@ def login():
 @login_required
 def logout():
     """Logs out currently logged user"""
+    user = current_user
+    auth_user(user, False)
     logout_user()
     return LoginLogoutResponse(logged=False, user=None).dict(), 200
 
@@ -142,13 +147,30 @@ def is_email_used():
         return StatusCodeResponse(500)
 
 
-@auth_bp.after_request
-def print_after_session(response):
-    print("user id in session AFTER REQUEST", session.get("_user_id"))
-    return response
-
-
 @auth_bp.route("/test", methods=["GET"])
 @login_required
 def test():
+
     return {"you must be logged in": True}
+
+
+# Method imported in app.__init__ as it is used globally (app.before_request)
+def validate_session_for_auth_user() -> None:
+    if "_user_id" not in session:
+        return
+    if request.endpoint == "auth_bp.logout":
+        return
+    user: Optional[User] = User.query.get(session["_user_id"])
+    user_session: Optional[UserSession] = user.session
+    now = datetime.now()
+    session_lifetime = current_app.config["PERMANENT_SESSION_LIFETIME"]
+    # Session stored in database has already expired or user is logged out
+    if user_session.expires_at <= now or user.authenticated == False:
+        user.authenticated = False
+        if user_session is not None:
+            db.session.delete(user_session)
+    # session is still valid
+    elif user_session.expires_at > now:
+        user_session.expires_at = now + timedelta(seconds=session_lifetime)
+    db.session.add(user)
+    db.session.commit()

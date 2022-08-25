@@ -1,4 +1,4 @@
-from sqlalchemy.orm import configure_mappers
+from sqlalchemy.orm import configure_mappers, relationship, backref
 from app.extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     updated_at = db.Column(
         db.DateTime, nullable=False, default=db.func.now(), onupdate=db.func.now()
     )
+    authenticated = db.Column(db.Boolean, nullable=False, default=False)
 
     @property
     def password(self):
@@ -36,6 +37,19 @@ class User(UserMixin, db.Model):
     @classmethod
     def query_by_email(cls: Type[T], email: str) -> Optional[T]:
         return cls.query.filter_by(email=email).first()
+
+    @UserMixin.is_authenticated.getter
+    def is_authenticated(self):
+        return self.authenticated
+
+
+class UserSession(db.Model):
+    id = id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True
+    )
+    expires_at = db.Column(db.DateTime, nullable=False)
+    user = relationship("User", backref=backref("session", uselist=False))
 
 
 configure_mappers()

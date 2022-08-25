@@ -1,7 +1,15 @@
+from app.auth.views import validate_session_for_auth_user
 from app.config import config
 from flask import Flask
 from app.errorHandlers import handler_400
-from .extensions import development_docs, login_manager, db, migrate, cors, session
+from .extensions import (
+    development_docs,
+    login_manager,
+    db,
+    migrate,
+    cors,
+    sess,
+)
 from app.auth import models as authModels
 from app.products import models as productsModels
 from app.profile import models as profileModels  # register all models for migration
@@ -38,6 +46,9 @@ def create_app(config_name):
     # Errorhandlers
     app.errorhandler(400)(handler_400)
 
+    # Authentication before request
+    app.before_request(validate_session_for_auth_user)
+
     # CORS
     cors.init_app(app)
 
@@ -45,7 +56,7 @@ def create_app(config_name):
     login_manager.init_app(app)
 
     # session
-    session.init_app(app)
+    sess.init_app(app)
 
     # Database
     db.init_app(app)
