@@ -13,12 +13,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(128), unique=True, nullable=False, index=True)
     username = db.Column(db.String(128), nullable=False, index=True)
     password_hash = db.Column(db.String(128), nullable=False)
-    email_activated = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     updated_at = db.Column(
         db.DateTime, nullable=False, default=db.func.now(), onupdate=db.func.now()
     )
     authenticated = db.Column(db.Boolean, nullable=False, default=False)
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
 
     @property
     def password(self):
@@ -36,7 +37,7 @@ class User(UserMixin, db.Model):
 
     @classmethod
     def query_by_email(cls: Type[T], email: str) -> Optional[T]:
-        return cls.query.filter_by(email=email).first()
+        return cls.query.filter_by(email=email).one_or_none()
 
     @UserMixin.is_authenticated.getter
     def is_authenticated(self):

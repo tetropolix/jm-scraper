@@ -1,14 +1,18 @@
 from datetime import datetime, timedelta
+import smtplib
 from typing import Optional
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, MultipleResultsFound
 from app.auth import auth_bp
 from flask_login import login_required, current_user
-from flask import request, session, current_app
+from flask import request, session, current_app, url_for
 from app.auth.db_actions import auth_user, create_user_with_profile, is_email_in_use
 from flask_login import login_user, logout_user
 from app.auth.models import User, UserSession
 from app.auth.auth_utils import is_safe_url, valid_email
+from app.email.email_utils import (
+    send_confirmation_email,
+)
 from .schemas.response_schemas import (
     CheckEmailResponse,
     LoginLogoutResponse,
@@ -63,10 +67,15 @@ def login():
         return StatusCodeResponse(400)
     user = User.query_by_email(email)
     if user is not None and user.verify_password(password):
+        userSchemaObj = UserSchema(email=user.email, username=user.username)
+        if user.confirmed == False:
+            return (
+                LoginLogoutResponse(user=userSchemaObj, needs_to_confirm=True).dict(),
+                200,
+            )
         logged = login_user(user)
         if not logged:
             return StatusCodeResponse(500)
-        userSchemaObj = UserSchema(email=user.email, username=user.username)
         if next and not is_safe_url(next):
             return StatusCodeResponse(400)
         elif next and is_safe_url(next):  # if next is okay just pass
@@ -76,7 +85,7 @@ def login():
             LoginLogoutResponse(logged=True, user=userSchemaObj, next=next).dict(),
             200,
         )
-    return LoginLogoutResponse().dict(), 200
+    LoginLogoutResponse().dict(), 200
 
 
 @auth_bp.route("/logout", methods=["GET"])
@@ -119,11 +128,18 @@ def register():
     elif password != retry_password:
         return RegisterResponse(errorOnRegister="PASSWORD_NO_MATCH").dict(), 200
     try:
-        newUser = User(email=email, username=username, password=password)
+        newUser = User(
+            email=email,
+            username=username,
+            password=password,
+            confirmed=False,
+            created_at=datetime.now(),
+        )
         create_user_with_profile(newUser)
         userSchemaObj = UserSchema(email=email, username=username)
+        send_confirmation_email(newUser.email)
         return RegisterResponse(registered=True, user=userSchemaObj).dict(), 200
-    except IntegrityError:
+    except (IntegrityError, smtplib.SMTPServerDisconnected):
         return StatusCodeResponse(500)
 
 
@@ -147,13 +163,6 @@ def is_email_used():
         return StatusCodeResponse(500)
 
 
-@auth_bp.route("/test", methods=["GET"])
-@login_required
-def test():
-
-    return {"you must be logged in": True}
-
-
 # Method imported in app.__init__ as it is used globally (app.before_request)
 def validate_session_for_auth_user() -> None:
     if "_user_id" not in session:
@@ -174,3 +183,9 @@ def validate_session_for_auth_user() -> None:
         user_session.expires_at = now + timedelta(seconds=session_lifetime)
     db.session.add(user)
     db.session.commit()
+
+
+@auth_bp.route("/test", methods=["POST"])
+def test():
+
+    return {"you must be logged in": True}

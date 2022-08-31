@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_session import Session
+from flask_mail import Mail
 from app.common.custom_classes import DocumentedApp
 
 cors = CORS(
@@ -38,6 +39,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 sess = Session()
+mail = Mail()
 
 
 def development_docs(app):

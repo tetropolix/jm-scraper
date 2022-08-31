@@ -2,14 +2,7 @@ from app.auth.views import validate_session_for_auth_user
 from app.config import config
 from flask import Flask
 from app.errorHandlers import handler_400
-from .extensions import (
-    development_docs,
-    login_manager,
-    db,
-    migrate,
-    cors,
-    sess,
-)
+from .extensions import development_docs, login_manager, db, migrate, cors, sess, mail
 from app.auth import models as authModels
 from app.products import models as productsModels
 from app.profile import models as profileModels  # register all models for migration
@@ -35,10 +28,12 @@ def create_app(config_name):
     from app.products import products_bp
     from app.auth import auth_bp
     from app.profile import profile_bp
+    from app.email import email_bp
 
     app.register_blueprint(products_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(email_bp)
 
     # Development docs
     if app.config.get("SHOW_DOCS"):
@@ -51,6 +46,9 @@ def create_app(config_name):
 
     # CORS
     cors.init_app(app)
+
+    # Mail
+    mail.init_app(app)
 
     # Auth
     login_manager.init_app(app)

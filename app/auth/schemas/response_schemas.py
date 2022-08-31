@@ -8,6 +8,7 @@ class LoginLogoutResponse(BaseModelDocumentable):
     logged: bool = False
     next: Optional[str] = None
     user: Optional[User] = None
+    needs_to_confirm: bool = False
 
 
 class RegisterResponse(BaseModelDocumentable):
@@ -22,6 +23,7 @@ class RegisterResponse(BaseModelDocumentable):
         ]
     ]
     user: Optional[User] = None
+    confirmed: bool = False
 
     @validator("errorOnRegister")
     def is_registered_false_on_error_message(cls, v, values):
