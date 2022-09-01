@@ -20,6 +20,7 @@ class User(UserMixin, db.Model):
     authenticated = db.Column(db.Boolean, nullable=False, default=False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
+    password_reset_token = db.Column(db.String(256), nullable=True)
 
     @property
     def password(self):

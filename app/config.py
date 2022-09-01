@@ -7,6 +7,7 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     CONFIRMATION_SALT = os.environ.get("CONFIRMATION_SALT")
+    PASSRESET_SALT = os.environ.get("PASSRESET_SALT")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = os.environ.get("SESSION_TYPE")
     PERMANENT_SESSION_LIFETIME = int(os.environ.get("PERMANENT_SESSION_LIFETIME"))

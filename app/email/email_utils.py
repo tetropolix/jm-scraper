@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Literal, Optional, Union
 from flask import current_app
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
@@ -13,17 +13,32 @@ CONFIRMATION_EMAIL_BODY = """Welcome, please use the following link for activati
 Activation link is valid for 60 minutes.
 This email is automatically generated, please do not respond."""
 
+PASS_RESET_EMAIL_SUBJECT = "Password reset for your account"
+PASS_RESET_EMAIL_BODY = """Please use the following link for resetting your password
 
-def generate_confirmation_token(email: str):
+{}
+
+Link is valid for 60 minutes.
+This email is automatically generated, please do not respond."""
+
+
+def get_token_salt(type: str) -> str:
+    salts = {"confirmation": "CONFIRMATION_SALT", "pass_reset": "PASSRESET_SALT"}
+    return current_app.config[salts[type]]
+
+
+def generate_token(email: str, token_type: Literal["confirmation", "pass_reset"]):
     serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
-    return serializer.dumps(email, salt=current_app.config["CONFIRMATION_SALT"])
+    return serializer.dumps(email, salt=get_token_salt(token_type))
 
 
-def confirm_token(token, expiration=3600) -> Optional[str]:
+def confirm_token(
+    token, token_type: Literal["confirmation", "pass_reset"], expiration=3600
+) -> Optional[str]:
     serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
     try:
         email = serializer.loads(
-            token, salt=current_app.config["CONFIRMATION_SALT"], max_age=expiration
+            token, salt=get_token_salt(token_type), max_age=expiration
         )
     except:
         return None
@@ -47,11 +62,25 @@ def send_email(
     mail.send(msg)
 
 
-def send_confirmation_email(user_email: str):
-    token = generate_confirmation_token(user_email)
+def send_confirmation_email(user_email: str) -> str:
+    """Sends confirmation email with token, returns generated token"""
+    token = generate_token(user_email, "confirmation")
     confirm_url = url_for("email_bp.confirm", token=token, _external=True)
     send_email(
         user_email,
         CONFIRMATION_EMAIL_SUBJECT,
         body=CONFIRMATION_EMAIL_BODY.format(confirm_url),
     )
+    return token
+
+
+def send_password_reset_email(user_email: str) -> str:
+    """Sends password reset email with token, returns generated token"""
+    token = generate_token(user_email, "pass_reset")
+    confirm_url = url_for("email_bp.password_reset", token=token, _external=True)
+    send_email(
+        user_email,
+        PASS_RESET_EMAIL_SUBJECT,
+        body=PASS_RESET_EMAIL_BODY.format(confirm_url),
+    )
+    return token
