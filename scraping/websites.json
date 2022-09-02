@@ -1,21 +1,4 @@
 {
-  "Queens": {
-    "customName": "Queens",
-    "domain": "https://www.queens.sk",
-    "config": {
-      "headers": {},
-      "Man": {
-        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-panske&page={}"
-      },
-      "Woman": {
-        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-damske&page={}"
-      },
-      "Kids": {
-        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-detske&page={}"
-      }
-    },
-    "scrapeFunctionName": "scrape_queens"
-  },
   "Footshop": {
     "customName": "Footshop",
     "domain": "https://www.footshop.sk",
@@ -53,5 +36,22 @@
       }
     },
     "scrapeFunctionName": "scrape_fs"
+  },
+  "Queens": {
+    "customName": "Queens",
+    "domain": "https://www.queens.sk",
+    "config": {
+      "headers": {},
+      "Man": {
+        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-panske&page={}"
+      },
+      "Woman": {
+        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-damske&page={}"
+      },
+      "Kids": {
+        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-detske&page={}"
+      }
+    },
+    "scrapeFunctionName": "scrape_queens"
   }
 }

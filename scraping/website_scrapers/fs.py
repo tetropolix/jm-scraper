@@ -26,7 +26,6 @@ def getAllProductsInfoFS(website: Website) -> dict:
     for gender in productsInfo:
         res = makeRequest(
             productsInfo[gender]["infoUrl"],
-            website.domain,
             headers=headers,
         )
         if res == None:
@@ -145,7 +144,6 @@ def assignSizesToProducts(
                         productsBySizeUrl.format(
                             filterKeyword, convertSizeForUrl(size), currentPage
                         ),
-                        website.domain,
                         headers=headers,
                     )
                     if res == None:
@@ -185,7 +183,7 @@ def getProductsFS(productsInfo: dict, website: Website) -> dict:
         totalPages = info["total_pages"]
         for i in range(currentPage, totalPages + 1):
             print(productsUrl.format(i))
-            res = makeRequest(productsUrl.format(i), website.domain, headers=headers)
+            res = makeRequest(productsUrl.format(i), headers=headers)
             extractDataFromFSResponse(productsDict, website, res, gender)
     return productsDict
 
