@@ -16,7 +16,7 @@ parser.add_argument(
     "-e",
     "--env_type",
     type=str,
-    help="specify environment (name of env variable)",
+    help="specify environment",
     default=ENV_TYPE,
 )
 parser.add_argument(
@@ -31,7 +31,7 @@ parser.add_argument(
     "--websites",
     type=str,
     default=WEBSITES,
-    help="name of env variable for information about websites to scrape",
+    help="path to json file containing info about websites to scrape",
 )
 
 parser.add_argument(

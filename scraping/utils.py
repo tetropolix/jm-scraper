@@ -9,7 +9,7 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 
-REQUEST_TIMEOUT = 0  # in seconds
+REQUEST_TIMEOUT = 0.05  # in seconds
 
 
 def getRandomUserAgent() -> str:
@@ -56,9 +56,7 @@ def createListOfWebsites(websitesJsonPath: str) -> List[Website]:
     return websiteList
 
 
-def makeRequest(
-    url: str, domain: str, headers: dict = None, wait: bool = True
-) -> Optional[dict]:
+def makeRequest(url: str, headers: dict = None, wait: bool = True) -> Optional[dict]:
     if wait:
         time.sleep(REQUEST_TIMEOUT)
     if not headers:
@@ -66,19 +64,16 @@ def makeRequest(
     else:
         headers["User-Agent"] = getRandomUserAgent()
     try:
-        # print("Making request to ", url)
         r = requests.get(url, headers=headers)
         if r.status_code > 299 or r.status_code < 200:
-            print(
-                "Failed to request " + domain + " - Status code " + str(r.status_code)
-            )
+            print("Failed to request " + url + " - Status code " + str(r.status_code))
         elif r == None:
             print("{} returned None!".format(url))
         else:
             return r.json()
     except requests.exceptions.RequestException as e:
         print(e)
-        print("Failed to request " + domain + " " + str(e))
+        print("Failed to request " + url + " " + str(e))
     return None
 
 

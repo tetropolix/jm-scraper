@@ -1,21 +1,4 @@
 {
-  "Queens": {
-    "customName": "Queens",
-    "domain": "https://www.queens.sk",
-    "config": {
-      "headers": {},
-      "Man": {
-        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-panske&page={}"
-      },
-      "Woman": {
-        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-damske&page={}"
-      },
-      "Kids": {
-        "url": "https://www.queens.sk/ajax/nextitems/?slug=tenisky-detske&page={}"
-      }
-    },
-    "scrapeFunctionName": "scrape_queens"
-  },
   "SVD": {
     "customName": "SVD",
     "domain": "https://www.sivasdescalzo.com",
@@ -39,43 +22,5 @@
       }
     },
     "scrapeFunctionName": "scrape_svd"
-  },
-  "Footshop": {
-    "customName": "Footshop",
-    "domain": "https://www.footshop.sk",
-    "config": {
-      "headers": {
-        "Host": "www.footshop.sk",
-        "Accept": "application/json",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Referer": "https://www.footshop.sk/",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "Connection": "keep-alive"
-      },
-      "productsInfo": {
-        "Man": {
-          "infoUrl": "https://www.footshop.sk/sk/5-panske-tenisky-a-topanky",
-          "info": {},
-          "productsUrl": "https://www.footshop.sk/sk/5-panske-tenisky-a-topanky/page-{}",
-          "productsBySizeUrl": "https://www.footshop.sk/sk/5-panske-tenisky-a-topanky/size_footwear_{}-{}/page-{}"
-        },
-        "Woman": {
-          "infoUrl": "https://www.footshop.sk/sk/6-damske-topanky-a-tenisky",
-          "info": {},
-          "productsUrl": "https://www.footshop.sk/sk/6-damske-topanky-a-tenisky/page-{}",
-          "productsBySizeUrl": "https://www.footshop.sk/sk/6-damske-topanky-a-tenisky/size_footwear_{}-{}/page-{}"
-        },
-        "Kids": {
-          "infoUrl": "https://www.footshop.sk/sk/55-detske-tenisky-a-topanky",
-          "info": {},
-          "productsUrl": "https://www.footshop.sk/sk/55-detske-tenisky-a-topanky/page-{}",
-          "productsBySizeUrl": "https://www.footshop.sk/sk/55-detske-tenisky-a-topanky/size_footwear_{}-{}/page-{}"
-        }
-      }
-    },
-    "scrapeFunctionName": "scrape_fs"
   }
 }

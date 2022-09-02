@@ -77,7 +77,7 @@ def getProductsSVD(website: Website, filterUrlPart: str = None) -> List:
             )
         )
         url = t.safe_substitute(currentPageValue=str(currentPage))
-        data = makeRequest(url, website.domain, headers=headers)
+        data = makeRequest(url, headers=headers)
         try:
             if data == None or len(data["data"]["products"]["items"]) == 0:
                 break
@@ -132,7 +132,7 @@ def addAdditionalFilterOptionsForDataSVD(
     filterDataToObtain = {}
     t = Template(queryUrl)
     url = t.safe_substitute(currentPageValue="1")
-    data = makeRequest(url, website.domain, headers=headers)
+    data = makeRequest(url, headers=headers)
     try:
         if data == None or len(data["data"]["products"]["aggregations"]) == 0:
             return None
