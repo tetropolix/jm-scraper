@@ -7,7 +7,7 @@ import argparse
 
 
 load_dotenv()
-WEBSITES = os.environ.get("WEBSITES_FILE_DEV")
+WEBSITES = os.environ.get("WEBSITES_FILE")
 ENV_TYPE = os.environ.get("ENV_TYPE")
 
 # Initialize parser with arguments
