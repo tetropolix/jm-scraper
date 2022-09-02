@@ -65,6 +65,9 @@ def makeRequest(url: str, headers: dict = None, wait: bool = True) -> Optional[d
         headers["User-Agent"] = getRandomUserAgent()
     try:
         r = requests.get(url, headers=headers)
+        print(r.headers)
+        print(r.cookies)
+        print(r.content)
         if r.status_code > 299 or r.status_code < 200:
             print("Failed to request " + url + " - Status code " + str(r.status_code))
         elif r == None:

@@ -60,9 +60,9 @@ def main() -> None:
     scraper = Scraper(websites, app)
     if args.to_file:
         scraper.scrapeToFile("scraped_data.json")
-    if args.delete_scraped:
-        scraper.removeAlreadyScraped()
-    if args.to_database:
+    if args.to_database and args.delete_scraped:
+        scraper.scrapeToDb(delete_already_scraped=True)
+    elif args.to_database:
         scraper.scrapeToDb()
 
 

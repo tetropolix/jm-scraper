@@ -49,12 +49,17 @@ class Scraper:
         with open(filePath, "w") as file:
             file.write(json.dumps(scrapedData))
 
-    def scrapeToDb(self) -> None:
+    def scrapeToDb(self, delete_already_scraped=False) -> None:
         scrapedData = self.scrape()
         scrapedAt = datetime.now()
         productDataInserted = 0
         start = time.time()
+
         with self.appInstance.app_context():
+            if delete_already_scraped:
+                removed = remove_products_with_product_data()
+                print("Removed products -", removed[0])
+                print("Removed product data -", removed[1])
             eshops = getEshopsDict()
             for product in scrapedData:
                 productId = insertProduct(product)
@@ -67,9 +72,3 @@ class Scraper:
             + " seconds for records insertion - %d records inserted"
             % productDataInserted
         )
-
-    def removeAlreadyScraped(self) -> Tuple[int, int]:
-        with self.appInstance.app_context():
-            removed = remove_products_with_product_data()
-        print("Removed products -", removed[0])
-        print("Removed product data -", removed[1])
