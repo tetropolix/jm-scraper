@@ -163,8 +163,6 @@ cython_debug/
 websites.json
 scrapedData.json
 temp_storage
-scraping/*
-!scraping/schemas.py
-scripts
-test.html
+scraping/websites-dev.json
+!scraping/websites.json
 flask_session

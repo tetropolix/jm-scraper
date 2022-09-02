@@ -252,6 +252,10 @@ ESHOPS = [
         "domain": "https://www.sivasdescalzo.com",
         "eshop_logo_url": "https://www.sivasdescalzo.com/static/version1657875030/frontend/Svd/theme/en_US/images/logo.svg",
     },
+    {
+        "domain": "https://www.queens.sk",
+        "eshop_logo_url": "https://www.queens.cz/assets/queens-min.svg",
+    },
 ]
 
 

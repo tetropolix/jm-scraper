@@ -1,6 +1,6 @@
 import json
 from typing import List, Set, Optional, Literal, Union
-from pydantic import BaseModel, ValidationError, root_validator
+from pydantic import BaseModel, ValidationError, root_validator, validator
 
 
 class ShoeSize(BaseModel):
@@ -55,6 +55,12 @@ class ShoeProduct(BaseModel):
             )
         else:
             return values
+
+    @validator("shoeId")
+    def shoe_id_less_than_32_chars(cls, v):
+        if len(v) > 32:
+            raise ValueError("Shoe id cannot have more than 32 chars")
+        return v
 
 
 def createShoeProduct(dictWithValues: dict) -> Optional[ShoeProduct]:

@@ -14,7 +14,7 @@ class ConfigNameNotFoundError(Exception):
 
 def create_app(config_name):
     if config_name == None:
-        raise ConfigNameNotFoundError("Config name was not specified - equals to None")
+        raise ConfigNameNotFoundError("Config name was not specified - None")
     configClass = config.get(config_name)
     if configClass == None:
         raise ConfigNameNotFoundError(

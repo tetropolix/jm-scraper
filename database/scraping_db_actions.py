@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from app.extensions import db
 from app.products.models import (
     Brand,
@@ -11,6 +11,10 @@ from app.products.models import (
     ShoeSizeEu,
     ShoeSizeUk,
     ShoeSizeUs,
+    shoe_size_cm_product_data,
+    shoe_size_eu_product_data,
+    shoe_size_uk_product_data,
+    shoe_size_us_product_data,
 )
 from scraping.schemas import ShoeProduct, ShoeSize
 
@@ -114,3 +118,11 @@ def getEshopsDict() -> dict:
     """
     eshops = queryEshops()
     return {eshop.domain: eshop.id for eshop in eshops}
+
+
+def remove_products_with_product_data() -> Tuple[int, int]:
+    """Returns tuple ( products deleted,product data deleted)"""
+    product_data_deleted = ProductData.query.delete()
+    products_deleted = Product.query.delete()
+    db.session.commit()
+    return products_deleted, product_data_deleted

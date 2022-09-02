@@ -4,36 +4,70 @@ from app.extensions import db
 shoe_size_eu_product_data = db.Table(
     "shoe_size_eu_product_data",
     db.Column("id", db.Integer, primary_key=True),
-    db.Column("shoe_size_id", db.Integer, db.ForeignKey("shoe_sizes_eu.id")),
-    db.Column("product_data_id", db.Integer, db.ForeignKey("product_data.id")),
+    db.Column(
+        "shoe_size_id",
+        db.Integer,
+        db.ForeignKey("shoe_sizes_eu.id", ondelete="CASCADE"),
+    ),
+    db.Column(
+        "product_data_id",
+        db.Integer,
+        db.ForeignKey("product_data.id", ondelete="CASCADE"),
+    ),
 )
 
 shoe_size_us_product_data = db.Table(
     "shoe_size_us_product_data",
     db.Column("id", db.Integer, primary_key=True),
-    db.Column("shoe_size_id", db.Integer, db.ForeignKey("shoe_sizes_us.id")),
-    db.Column("product_data_id", db.Integer, db.ForeignKey("product_data.id")),
+    db.Column(
+        "shoe_size_id",
+        db.Integer,
+        db.ForeignKey("shoe_sizes_us.id", ondelete="CASCADE"),
+    ),
+    db.Column(
+        "product_data_id",
+        db.Integer,
+        db.ForeignKey("product_data.id", ondelete="CASCADE"),
+    ),
 )
 
 shoe_size_uk_product_data = db.Table(
     "shoe_size_uk_product_data",
     db.Column("id", db.Integer, primary_key=True),
-    db.Column("shoe_size_id", db.Integer, db.ForeignKey("shoe_sizes_uk.id")),
-    db.Column("product_data_id", db.Integer, db.ForeignKey("product_data.id")),
+    db.Column(
+        "shoe_size_id",
+        db.Integer,
+        db.ForeignKey("shoe_sizes_uk.id", ondelete="CASCADE"),
+    ),
+    db.Column(
+        "product_data_id",
+        db.Integer,
+        db.ForeignKey("product_data.id", ondelete="CASCADE"),
+    ),
 )
 
 shoe_size_cm_product_data = db.Table(
     "shoe_size_cm_product_data",
     db.Column("id", db.Integer, primary_key=True),
-    db.Column("shoe_size_id", db.Integer, db.ForeignKey("shoe_sizes_cm.id")),
-    db.Column("product_data_id", db.Integer, db.ForeignKey("product_data.id")),
+    db.Column(
+        "shoe_size_id",
+        db.Integer,
+        db.ForeignKey("shoe_sizes_cm.id", ondelete="CASCADE"),
+    ),
+    db.Column(
+        "product_data_id",
+        db.Integer,
+        db.ForeignKey("product_data.id", ondelete="CASCADE"),
+    ),
 )
 
 product_gender = db.Table(
     "product_gender",
     db.Column("id", db.Integer, primary_key=True),
-    db.Column("product_id", db.Integer, db.ForeignKey("products.id")),
-    db.Column("gender_id", db.Integer, db.ForeignKey("genders.id")),
+    db.Column(
+        "product_id", db.Integer, db.ForeignKey("products.id", ondelete="CASCADE")
+    ),
+    db.Column("gender_id", db.Integer, db.ForeignKey("genders.id", ondelete="CASCADE")),
 )
 
 
@@ -42,7 +76,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     brand_id = db.Column(db.Integer, db.ForeignKey("brands.id"), nullable=False)
-    shoe_id = db.Column(db.String(64), nullable=False, unique=True)
+    shoe_id = db.Column(db.String(32), nullable=False, unique=True)
     product_image_url = db.Column(db.String(512), nullable=False)
     product_data = relationship("ProductData", backref="product", lazy="dynamic")
     genders = relationship(
@@ -79,7 +113,9 @@ class ProductData(db.Model):
     original_price = db.Column(db.Numeric(6, 2), nullable=True)
     percent_off = db.Column(db.Numeric(4, 2), nullable=True)
     out_of_stock = db.Column(db.Boolean, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    product_id = db.Column(
+        db.Integer, db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False
+    )
     eshop_id = db.Column(db.Integer, db.ForeignKey("eshops.id"), nullable=False)
     shoe_sizes_eu = relationship(
         "ShoeSizeEu",
