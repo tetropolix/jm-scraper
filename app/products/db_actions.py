@@ -211,7 +211,8 @@ def query_filter_options() -> dict:
     res["maxPrice"] = max((pd.final_price for pd in latest_product_data), default=0)
     res["minPrice"] = min((pd.final_price for pd in latest_product_data), default=0)
     res["maxPercentOff"] = max(
-        (pd.percent_off for pd in latest_product_data), default=0
+        (pd.percent_off for pd in latest_product_data if pd.percent_off is not None),
+        default=0,
     )
     res["isSomethingOutOfStock"] = next(
         (True for pd in latest_product_data if pd.out_of_stock), False

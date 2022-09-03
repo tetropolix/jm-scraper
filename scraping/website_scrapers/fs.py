@@ -176,15 +176,19 @@ def getProductsFS(productsInfo: dict, website: Website) -> dict:
     headers = itemgetter("headers")(website.config)
     productsDict = {}
     for gender in productsInfo:
-        info = productsInfo[gender]["info"]
-        productsUrl = productsInfo[gender]["productsUrl"]
-        headers["Referer"] = productsInfo[gender]["infoUrl"]
-        currentPage = info["page"]
-        totalPages = info["total_pages"]
-        for i in range(currentPage, totalPages + 1):
-            print(productsUrl.format(i))
-            res = makeRequest(productsUrl.format(i), headers=headers)
-            extractDataFromFSResponse(productsDict, website, res, gender)
+        try:
+            info = productsInfo[gender]["info"]
+            productsUrl = productsInfo[gender]["productsUrl"]
+            headers["Referer"] = productsInfo[gender]["infoUrl"]
+            currentPage = info["page"]
+            totalPages = info["total_pages"]
+            for i in range(currentPage, totalPages + 1):
+                print(productsUrl.format(i))
+                res = makeRequest(productsUrl.format(i), headers=headers)
+                extractDataFromFSResponse(productsDict, website, res, gender)
+        except KeyError:
+            print('KeyError getting products info')
+            return {}
     return productsDict
 
 
