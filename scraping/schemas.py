@@ -51,7 +51,7 @@ class ShoeProduct(BaseModel):
     def checkStockAndSizes(cls, values):
         if not any([values["shoeSize"].isAnySizeListPopulated(), values["outOfStock"]]):
             raise ValueError(
-                "If outOfStock is False at least one size list for product must be populated!"
+                "If outOfStock is False at least one size list for product must be populated"
             )
         else:
             return values
