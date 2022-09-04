@@ -5,6 +5,8 @@ from flask_mail import Message
 from app.extensions import mail
 from flask import url_for
 
+FRONTEND_BASE = current_app.config["FRONTEND_BASE"]
+
 CONFIRMATION_EMAIL_SUBJECT = "New user account confirmation"
 CONFIRMATION_EMAIL_BODY = """Welcome, please use the following link for activating your account
 
@@ -65,7 +67,7 @@ def send_email(
 def send_confirmation_email(user_email: str) -> str:
     """Sends confirmation email with token, returns generated token"""
     token = generate_token(user_email, "confirmation")
-    confirm_url = url_for("email_bp.confirm", token=token, _external=True)
+    confirm_url = url_for(FRONTEND_BASE + "/confirm", token=token, _external=True)
     send_email(
         user_email,
         CONFIRMATION_EMAIL_SUBJECT,
@@ -77,7 +79,7 @@ def send_confirmation_email(user_email: str) -> str:
 def send_password_reset_email(user_email: str) -> str:
     """Sends password reset email with token, returns generated token"""
     token = generate_token(user_email, "pass_reset")
-    confirm_url = url_for("email_bp.password_reset", token=token, _external=True)
+    confirm_url = url_for(FRONTEND_BASE + "/passReset", token=token, _external=True)
     send_email(
         user_email,
         PASS_RESET_EMAIL_SUBJECT,

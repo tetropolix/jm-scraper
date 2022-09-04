@@ -318,6 +318,7 @@ def get_product_dicts_from_product_hrefs(product_hrefs: List[ProductHref], domai
                 products_by_eshop_id[eshop_product_id] = product_dict
             except ParsingProductPageHtmlError as e:
                 print(e)
+        break
     return products_by_eshop_id.values()
 
 

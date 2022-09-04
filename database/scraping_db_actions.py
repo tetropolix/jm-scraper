@@ -7,6 +7,7 @@ from app.products.models import (
     Gender,
     Product,
     ProductData,
+    Scrape,
     ShoeSizeCm,
     ShoeSizeEu,
     ShoeSizeUk,
@@ -65,7 +66,8 @@ def addShoeSizesForProductData(
     return productData
 
 
-def insertProduct(shoe: ShoeProduct) -> int:
+def insertProduct(shoe: ShoeProduct) -> Tuple[int, bool]:
+    """Inserts product into DB and returns tuple - (product_id,newly_inserted)"""
     product = Product.query.filter_by(shoe_id=shoe.shoeId).first()
     if product == None:  # Product not in database
         brandId = insertBrand(shoe.brandName)
@@ -79,8 +81,8 @@ def insertProduct(shoe: ShoeProduct) -> int:
         newProduct.genders.extend(genders)
         db.session.add(newProduct)
         db.session.commit()
-        return newProduct.id
-    return product.id
+        return newProduct.id, True
+    return product.id, False
 
 
 def insertProductData(
@@ -121,8 +123,31 @@ def getEshopsDict() -> dict:
 
 
 def remove_products_with_product_data() -> Tuple[int, int]:
-    """Returns tuple ( products deleted,product data deleted)"""
+    """Returns tuple (products deleted,product data deleted)"""
     product_data_deleted = ProductData.query.delete()
     products_deleted = Product.query.delete()
     db.session.commit()
     return products_deleted, product_data_deleted
+
+
+def insert_data_about_scrape(
+    scraped_at: datetime,
+    products_scraped: int,
+    product_data_scraped: int,
+    scrape_length_secs: int,
+    products_count: int,
+) -> Optional[int]:
+    scrape = Scrape(
+        scraped_at=scraped_at,
+        products_scraped=products_scraped,
+        product_data_scraped=product_data_scraped,
+        scrape_length_secs=scrape_length_secs,
+        products_count=products_count,
+    )
+    db.session.add(scrape)
+    db.session.commit()
+    return scrape.id
+
+
+def get_products_count():
+    return db.session.query(Product).count()

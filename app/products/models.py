@@ -209,4 +209,14 @@ class Gender(db.Model):
         return "<Gender %s>" % self.gender
 
 
+class Scrape(db.Model):
+    __tablename__ = "scrapes"
+    id = db.Column(db.Integer, primary_key=True)
+    scraped_at = db.Column(db.DateTime, nullable=False)
+    products_scraped = db.Column(db.Integer, nullable=False)
+    product_data_scraped = db.Column(db.Integer, nullable=False)
+    scrape_length_secs = db.Column(db.Numeric(8, 2), nullable=False)
+    products_count = db.Column(db.Integer, nullable=False)
+
+
 configure_mappers()

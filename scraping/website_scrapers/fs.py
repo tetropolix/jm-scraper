@@ -186,8 +186,9 @@ def getProductsFS(productsInfo: dict, website: Website) -> dict:
                 print(productsUrl.format(i))
                 res = makeRequest(productsUrl.format(i), headers=headers)
                 extractDataFromFSResponse(productsDict, website, res, gender)
+                break
         except KeyError:
-            print('KeyError getting products info')
+            print("KeyError getting products info")
             return {}
     return productsDict
 
