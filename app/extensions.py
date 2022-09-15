@@ -24,6 +24,10 @@ cors = CORS(
             "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
             "methods": ["GET", "POST", "OPTIONS"],
         },
+        r"/email/*": {
+            "origins": ["http://localhost:4200", "https://vagoshop.netlify.app"],
+            "methods": ["POST", "OPTIONS"],
+        },
     },
     supports_credentials=True,
     allow_headers=[
