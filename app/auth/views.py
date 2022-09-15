@@ -135,9 +135,9 @@ def register():
             confirmed=False,
             created_at=datetime.now(),
         )
+        send_confirmation_email(newUser.email)
         create_user_with_profile(newUser)
         userSchemaObj = UserSchema(email=email, username=username)
-        send_confirmation_email(newUser.email)
         return RegisterResponse(registered=True, user=userSchemaObj).dict(), 200
     except (IntegrityError, smtplib.SMTPServerDisconnected):
         return StatusCodeResponse(500)
