@@ -17,7 +17,6 @@ class RegisterResponse(BaseModelDocumentable):
         Literal[
             "EMAIL_IN_USE",
             "INVALID_EMAIL",
-            "SHORT_PASSWORD",
             "EMPTY_USERNAME",
             "PASSWORD_NO_MATCH",
         ]

@@ -123,8 +123,6 @@ def register():
         return RegisterResponse(errorOnRegister="INVALID_EMAIL").dict(), 200
     elif len(username) == 0:
         return RegisterResponse(errorOnRegister="EMPTY_USERNAME").dict(), 200
-    elif len(password) < 8:
-        return RegisterResponse(errorOnRegister="SHORT_PASSWORD").dict(), 200
     elif password != retry_password:
         return RegisterResponse(errorOnRegister="PASSWORD_NO_MATCH").dict(), 200
     try:
