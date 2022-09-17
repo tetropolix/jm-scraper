@@ -68,11 +68,9 @@ def login():
     user = User.query_by_email(email)
     if user is not None and user.verify_password(password):
         userSchemaObj = UserSchema(email=user.email, username=user.username)
+        needs_to_confirm = False
         if user.confirmed == False:
-            return (
-                LoginLogoutResponse(user=userSchemaObj, needs_to_confirm=True).dict(),
-                200,
-            )
+            needs_to_confirm = True
         logged = login_user(user)
         if not logged:
             return StatusCodeResponse(500)
@@ -82,7 +80,12 @@ def login():
             pass
         auth_user(user, True)
         return (
-            LoginLogoutResponse(logged=True, user=userSchemaObj, next=next).dict(),
+            LoginLogoutResponse(
+                logged=True,
+                user=userSchemaObj,
+                next=next,
+                needs_to_confirm=needs_to_confirm,
+            ).dict(),
             200,
         )
     LoginLogoutResponse().dict(), 200
